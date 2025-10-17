@@ -1,0 +1,44 @@
+# Go build
+/bin/
+/build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.cov
+
+# Dependency directories (remove the comment below if you use Go modules)
+/vendor/
+
+# Go workspace file
+*.code-workspace
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+
+# Swag generated docs
+/docs/*.json
+/docs/*.yaml
+
+# Env files
+.env
+
+
+# Logs
+*.log
+
+# Mac system files
+.DS_Store
+
+# Migration binaries
+migrations/*.exe
+migrations/*.out
