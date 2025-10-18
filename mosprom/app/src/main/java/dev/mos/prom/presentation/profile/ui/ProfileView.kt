@@ -95,7 +95,8 @@ fun ProfileView(
             Column {
                 Text(
                     text = state.userModel.name,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, color = Color.Black)
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black
                 )
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -110,10 +111,10 @@ fun ProfileView(
 
         // Блоки
         SectionHeader("О себе")
-        Text(state.userModel.description.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+    Text(state.userModel.description.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
 
     SectionHeader("Образование")
-    Text(state.userModel.education.ifBlank { "—" }, fontWeight = FontWeight.Bold, color = Color.Black)
+    Text(state.userModel.education.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), color = Color.Black)
 
         SectionHeader("Направления")
         FlowRow(
@@ -144,7 +145,7 @@ fun ProfileView(
         }
 
         SectionHeader("Проекты")
-        Text("—", fontWeight = FontWeight.Bold, color = Color.Black)
+    Text("—", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), color = Color.Black)
 
 
     }

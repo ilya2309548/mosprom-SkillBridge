@@ -51,10 +51,10 @@ fun RegisterScreen(
         Spacer(Modifier.height(12.dp))
         MosTextField(label = "ФИО*", value = state.name, onValueChange = { viewModel.onEvent(RegisterEvent.NameChanged(it)) })
         Button(onClick = { viewModel.onEvent(RegisterEvent.Submit) }, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
-            Text("Создать аккаунт")
+            Text("Создать аккаунт", style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
         }
         if (state.status == MosPromResult.Error) {
-            Text("Ошибка: ${state.errorMessage ?: "неизвестно"}")
+            Text("Ошибка: ${state.errorMessage ?: "неизвестно"}", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
         }
     }
 }

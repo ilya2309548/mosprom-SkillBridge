@@ -60,16 +60,13 @@ fun MosPromErrorMessage (
                     .padding(top = 16.dp, bottom = 8.dp),
                 text = it,
                 color = MaterialTheme.colorScheme.surfaceContainer,
-                fontWeight = FontWeight.W400,
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
-                letterSpacing = 0.25.sp,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
         }
 
         Button(onClick = onUpdate, modifier = Modifier.fillMaxWidth()) {
-            Text("Обновить", color = MaterialTheme.colorScheme.onPrimary)
+            Text("Обновить", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.labelLarge)
         }
 
     }

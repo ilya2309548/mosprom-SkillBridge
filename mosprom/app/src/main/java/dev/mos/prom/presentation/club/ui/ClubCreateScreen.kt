@@ -141,8 +141,9 @@ fun ClubCreateScreen(
                             }
                         }
                         Spacer(Modifier.width(12.dp))
+
                         Column(Modifier.weight(1f)) {
-                            Text("Название клуба", color = Color.Black, fontWeight = FontWeight.SemiBold)
+                            Text("Название клуба", color = Color.Black, fontWeight = FontWeight.SemiBold, style = androidx.compose.material3.MaterialTheme.typography.titleSmall)
                             MosTextField(label = "", value = state.name, onValueChange = { viewModel.onEvent(ClubCreateEvent.NameChanged(it)) })
                         }
                     }
@@ -157,14 +158,26 @@ fun ClubCreateScreen(
                     )
 
                     Spacer(Modifier.height(12.dp))
-                    OutlinedButton(onClick = { showDirectionsSheet = true }) { Text("Выбрать направления") }
-                    if (state.selectedDirections.isNotEmpty()) {
+
+                    OutlinedButton(
+                        onClick = { showDirectionsSheet = true }
+                    ) {
+                        Text("Выбрать направления", style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
+                    }
+
+                    if (
+                        state.selectedDirections.isNotEmpty()
+                    ) {
                         Spacer(Modifier.height(8.dp))
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
                             state.selectedDirections.forEach { dir ->
                                 androidx.compose.material3.AssistChip(
                                     onClick = { viewModel.onEvent(ClubCreateEvent.ToggleDirection(dir)) },
-                                    label = { Text(dir, color = Color.Black) },
+                                    label = { Text(dir, color = Color.Black, style = androidx.compose.material3.MaterialTheme.typography.labelSmall) },
                                     colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                     ),
@@ -174,10 +187,14 @@ fun ClubCreateScreen(
                         }
                     }
 
-                    if (state.selectedDirections.isNotEmpty()) {
+                    if (
+                        state.selectedDirections.isNotEmpty()
+                    ) {
+
                         Spacer(Modifier.height(16.dp))
+
                         if (state.existingClubs.isEmpty()) {
-                            Text("Вы будете первый, кто откроет клуб по этому направлению", color = Color.Black)
+                            Text("Вы будете первый, кто откроет клуб по этому направлению", color = Color.Black, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
                         } else {
                             state.existingClubs.forEach { c ->
                                 Row(
@@ -200,8 +217,8 @@ fun ClubCreateScreen(
                                     Spacer(Modifier.width(12.dp))
 
                                     Column(Modifier.weight(1f)) {
-                                        Text(c.name, fontWeight = FontWeight.SemiBold, color = Color.Black)
-                                        Text(c.description, color = Color.Black.copy(alpha = 0.7f))
+                                        Text(c.name, fontWeight = FontWeight.SemiBold, color = Color.Black, style = androidx.compose.material3.MaterialTheme.typography.titleSmall)
+                                        Text(c.description, color = Color.Black.copy(alpha = 0.7f), style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                     }
                                 }
                                 Spacer(Modifier.height(8.dp))
@@ -211,7 +228,7 @@ fun ClubCreateScreen(
 
                     Spacer(Modifier.height(24.dp))
                     Button(onClick = { viewModel.onEvent(ClubCreateEvent.Submit) }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                        Text("Создать")
+                        Text("Создать", style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
                     }
                     if (showDirectionsSheet) {
                         ModalBottomSheet(onDismissRequest = { showDirectionsSheet = false }) {
@@ -223,7 +240,7 @@ fun ClubCreateScreen(
                                         val selected = dir in state.selectedDirections
                                         androidx.compose.material3.AssistChip(
                                             onClick = { viewModel.onEvent(ClubCreateEvent.ToggleDirection(dir)) },
-                                            label = { Text(dir, color = if (selected) Color.White else Color.Black) },
+                                            label = { Text(dir, color = if (selected) Color.White else Color.Black, style = androidx.compose.material3.MaterialTheme.typography.labelSmall) },
                                             colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
                                                 containerColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                                             )
@@ -231,7 +248,7 @@ fun ClubCreateScreen(
                                     }
                                 }
                                 Spacer(Modifier.height(16.dp))
-                                OutlinedButton(onClick = { showDirectionsSheet = false }, modifier = Modifier.fillMaxWidth()) { Text("Готово") }
+                                OutlinedButton(onClick = { showDirectionsSheet = false }, modifier = Modifier.fillMaxWidth()) { Text("Готово", style = androidx.compose.material3.MaterialTheme.typography.labelLarge) }
                             }
                         }
                     }

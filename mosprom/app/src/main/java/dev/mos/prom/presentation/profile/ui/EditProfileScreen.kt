@@ -127,7 +127,7 @@ fun EditProfileScreen(
                             )
                         }
                         Spacer(Modifier.size(12.dp))
-                        Text("Сменить фото", color = Color.Black, modifier = Modifier.clickable { pickLauncher.launch("image/*") })
+                        Text("Сменить фото", color = Color.Black, modifier = Modifier.clickable { pickLauncher.launch("image/*") }, style = MaterialTheme.typography.labelLarge)
                     }
 
                     Spacer(Modifier.size(16.dp))
@@ -151,7 +151,7 @@ fun EditProfileScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp)
-                    ) { Text("Сохранить") }
+                    ) { Text("Сохранить", style = MaterialTheme.typography.labelLarge) }
 
                     LaunchedEffect(state.status, lastSubmitted) {
                         if (lastSubmitted) {

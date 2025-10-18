@@ -101,7 +101,10 @@ fun MosPromApp() {
                         navController = navController,
                         innerPadding = innerPadding,
                         id = args.id,
-                        name = args.name
+                        name = args.name,
+                        logoUrl = args.logoUrl,
+                        description = args.description,
+                        directions = args.directions
                     )
                 }
 

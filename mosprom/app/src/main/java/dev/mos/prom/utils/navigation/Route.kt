@@ -35,8 +35,14 @@ sealed interface Route {
     @Serializable
     data object Register : Route
 
-    // Club details with id to load data and optional name for title fallback
+    // Club details with id and optional payload to render without refetch
     @Serializable
-    data class Club(val id: Long, val name: String? = null) : Route
+    data class Club(
+        val id: Long,
+        val name: String? = null,
+        val logoUrl: String? = null,
+        val description: String? = null,
+        val directions: List<String> = emptyList()
+    ) : Route
 
 }

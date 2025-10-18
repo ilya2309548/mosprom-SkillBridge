@@ -8,13 +8,16 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.ProvideTextStyle
 
 
 private val LightColorScheme = lightColorScheme(
     primary = Color(0xFF537E70),
     surface = Color(0xFFF3EDF7),
+    surfaceVariant = Color(0xFFE2E2E8),
     onSurfaceVariant = Color(0xFFEFFAFF),
     onSurface = Color(0xFFFEF7FF),
     inverseOnSurface = Color(0xFF1D1B20),
@@ -51,6 +54,10 @@ fun MospromTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = MosTypography,
-        content = content
-    )
+    ) {
+        // Safety net: ensure Nunito is applied even when Text doesn't reference MaterialTheme.typography
+        ProvideTextStyle(value = MosTypography.bodyMedium) {
+            content()
+        }
+    }
 }

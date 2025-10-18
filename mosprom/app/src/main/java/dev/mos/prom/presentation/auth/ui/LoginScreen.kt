@@ -48,13 +48,13 @@ fun LoginScreen(
         Spacer(Modifier.height(12.dp))
         MosTextField(label = "Пароль", value = state.password, onValueChange = { viewModel.onEvent(LoginEvent.PasswordChanged(it)) }, visualTransformation = PasswordVisualTransformation())
         Button(onClick = { viewModel.onEvent(LoginEvent.Submit) }, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
-            Text("Войти")
+            Text("Войти", style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
         }
         Button(onClick = { navController.navigate(Route.Register) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-            Text("Регистрация")
+            Text("Регистрация", style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
         }
         if (state.status == MosPromResult.Error) {
-            Text("Ошибка: ${state.errorMessage ?: "неизвестно"}")
+            Text("Ошибка: ${state.errorMessage ?: "неизвестно"}", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
         }
     }
 }

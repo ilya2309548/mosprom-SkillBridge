@@ -87,8 +87,13 @@ fun SearchScreen(
                         .verticalScroll(scroll)
                         .padding(horizontal = 16.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(
+                            Modifier.weight(1f)
+                        ) {
                             MosTextField(
                                 label = "Поиск",
                                 value = state.query,
@@ -96,14 +101,22 @@ fun SearchScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
+
                         Spacer(Modifier.width(8.dp))
-                        Button(onClick = { viewModel.onEvent(SearchEvent.DoSearch) }) { Text("Искать") }
+
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(SearchEvent.DoSearch)
+                            }
+                        ) { Text("Искать", style = MaterialTheme.typography.labelLarge) }
                     }
 
                     Spacer(Modifier.height(12.dp))
+
                     OutlinedButton(onClick = { showDirectionsSheet = true }) {
-                        Text("Направления")
+                        Text("Выбрать направления", style = MaterialTheme.typography.labelLarge)
                     }
+
                     if (state.selectedDirections.isNotEmpty()) {
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -112,7 +125,7 @@ fun SearchScreen(
                             state.selectedDirections.forEach { dir ->
                                 androidx.compose.material3.AssistChip(
                                     onClick = { viewModel.onEvent(SearchEvent.ToggleDirection(dir)) },
-                                    label = { Text(dir, color = Color.Black) },
+                                    label = { Text(dir, color = Color.Black, style = MaterialTheme.typography.labelSmall) },
                                     colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                     ),
@@ -129,7 +142,17 @@ fun SearchScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp)
-                                .clickable { navController.navigate(Route.Club(id = club.id, name = club.name)) }
+                                .clickable {
+                                    navController.navigate(
+                                        Route.Club(
+                                            id = club.id,
+                                            name = club.name,
+                                            logoUrl = club.logoUrl,
+                                            description = club.description,
+                                            directions = club.directions
+                                        )
+                                    )
+                                }
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -156,7 +179,7 @@ fun SearchScreen(
                                         club.directions.forEach { d ->
                                             androidx.compose.material3.AssistChip(
                                                 onClick = {},
-                                                label = { Text(d, color = Color.Black) },
+                                                label = { Text(d, color = Color.Black, style = MaterialTheme.typography.labelSmall) },
                                                 enabled = false,
                                                 border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.25f))
                                             )
@@ -179,7 +202,7 @@ fun SearchScreen(
                                         val selected = dir in state.selectedDirections
                                         androidx.compose.material3.AssistChip(
                                             onClick = { viewModel.onEvent(SearchEvent.ToggleDirection(dir)) },
-                                            label = { Text(dir, color = if (selected) Color.White else Color.Black) },
+                                            label = { Text(dir, color = if (selected) Color.White else Color.Black, style = MaterialTheme.typography.labelSmall) },
                                             colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
                                                 containerColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                                             )
@@ -188,7 +211,7 @@ fun SearchScreen(
                                 }
                                 Spacer(Modifier.height(16.dp))
                                 OutlinedButton(onClick = { showDirectionsSheet = false }, modifier = Modifier.fillMaxWidth()) {
-                                    Text("Готово")
+                                    Text("Готово", style = MaterialTheme.typography.labelLarge)
                                 }
                             }
                         }

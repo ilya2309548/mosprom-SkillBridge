@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,26 +27,24 @@ fun MosPromTopBar (
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .systemBarsPadding()
+            .statusBarsPadding()
             .padding(start = 8.dp, end = 8.dp)
     ) {
-        // Title по центру
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.titleLarge
+                .copy(fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.align(Alignment.Center)
         )
 
-        // Навигационная иконка слева
         navIcon?.let {
             Box(modifier = Modifier.align(Alignment.CenterStart)) {
                 it()
             }
         }
 
-        // Actions справа
         actions?.let {
             Box(modifier = Modifier.align(Alignment.CenterEnd)) {
                 it()

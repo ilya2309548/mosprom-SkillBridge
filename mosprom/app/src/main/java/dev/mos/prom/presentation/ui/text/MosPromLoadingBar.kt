@@ -64,10 +64,7 @@ fun MosPromLoadingBar (
                 .padding(top = 16.dp, bottom = 8.dp),
             text = randomJoke,
             color = Color.Black,
-            fontWeight = FontWeight.W400,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
-            letterSpacing = 0.25.sp,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
     }
