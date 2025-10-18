@@ -9,12 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import dev.mos.prom.utils.navigation.Route
 import dev.mos.prom.presentation.auth.ui.LoginScreen
 import dev.mos.prom.presentation.auth.ui.RegisterScreen
 import dev.mos.prom.presentation.profile.ui.ProfileScreen
 import dev.mos.prom.presentation.profile.ui.EditProfileScreen
 import dev.mos.prom.presentation.club.ui.ClubCreateScreen
+import dev.mos.prom.presentation.club.ui.ClubDetailsScreen
 import dev.mos.prom.presentation.search.ui.SearchScreen
 import dev.mos.prom.presentation.splash.ui.SplashScreen
 import dev.mos.prom.presentation.ui.theme.MospromTheme
@@ -90,6 +92,16 @@ fun MosPromApp() {
                     ClubCreateScreen(
                         innerPadding = innerPadding,
                         navController = navController,
+                    )
+                }
+
+                composable<Route.Club> { backStackEntry ->
+                    val args = backStackEntry.toRoute<Route.Club>()
+                    ClubDetailsScreen(
+                        navController = navController,
+                        innerPadding = innerPadding,
+                        id = args.id,
+                        name = args.name
                     )
                 }
 

@@ -36,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,8 +50,7 @@ import dev.mos.prom.utils.MosPromResult
 import dev.mos.prom.utils.navigation.MosPromBottomBar
 import dev.mos.prom.utils.navigation.MosPromTopBar
 import dev.mos.prom.utils.navigation.Route
-import dev.mos.prom.R
-import dev.mos.prom.presentation.ui.util.placeholderPainter
+import dev.mos.prom.utils.placeholderPainter
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -131,7 +129,7 @@ fun SearchScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp)
-                                .clickable { navController.navigate("club/${'$'}{club.id}") }
+                                .clickable { navController.navigate(Route.Club(id = club.id, name = club.name)) }
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,

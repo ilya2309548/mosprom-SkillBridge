@@ -35,6 +35,8 @@ sealed interface Route {
     @Serializable
     data object Register : Route
 
-    // Typed destination for a club details screen would normally carry an id argument.
+    // Club details with id to load data and optional name for title fallback
+    @Serializable
+    data class Club(val id: Long, val name: String? = null) : Route
 
 }

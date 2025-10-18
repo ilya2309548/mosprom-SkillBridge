@@ -49,7 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import dev.mos.prom.R
-import dev.mos.prom.presentation.ui.util.placeholderPainter
+import dev.mos.prom.utils.placeholderPainter
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateEvent
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateViewModel
 import dev.mos.prom.presentation.ui.components.MosTextField
