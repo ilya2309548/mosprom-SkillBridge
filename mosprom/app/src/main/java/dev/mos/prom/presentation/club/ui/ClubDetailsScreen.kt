@@ -85,7 +85,8 @@ fun ClubDetailsScreen(
                     .padding(16.dp)
                     .navigationBarsPadding(),
             ) {
-                Button(onClick = { /* TODO subscribe */ }, modifier = Modifier.align(Alignment.Center)) {
+                Button(onClick = { /* TODO subscribe */ },
+                    modifier = Modifier.align(Alignment.Center)) {
                     Text("Подписаться")
                 }
             }
@@ -145,33 +146,60 @@ fun ClubDetailsScreen(
             Text(uiDescription, style = MaterialTheme.typography.bodyMedium, color = Color.Black, modifier = Modifier.padding(top = 6.dp))
 
             Spacer(Modifier.height(16.dp))
-            TabRow(selectedTabIndex = tabIndex) {
-                Tab(selected = tabIndex == 0, onClick = { tabIndex = 0 }, text = { Text("Посты") })
-                Tab(selected = tabIndex == 1, onClick = { tabIndex = 1 }, text = { Text("События") })
+
+            TabRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                selectedTabIndex = tabIndex,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ) {
+                Tab(
+                    selected = tabIndex == 0,
+                    onClick = { tabIndex = 0 },
+                    text = { Text("Посты", style = MaterialTheme.typography.labelLarge)
+                })
+                Tab(
+                    selected = tabIndex == 1,
+                    onClick = { tabIndex = 1 },
+                    text = { Text("События", style = MaterialTheme.typography.labelLarge)
+                })
             }
 
             Spacer(Modifier.height(12.dp))
 
             when (tabIndex) {
                 0 -> {
-                    Image(
-                        painter = painterResource(R.drawable.ic_no_posts),
-                        contentDescription = null,
+                    Column (
                         modifier = Modifier
-                            .width(140.dp)
-                            .padding(vertical = 24.dp),
-                        contentScale = ContentScale.FillWidth
-                    )
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_no_posts),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .width(140.dp)
+                                .padding(vertical = 24.dp),
+                            contentScale = ContentScale.FillWidth
+                        )
+                    }
+
                 }
                 1 -> {
-                    Image(
-                        painter = painterResource(R.drawable.ic_no_posts),
-                        contentDescription = null,
+                    Column (
                         modifier = Modifier
-                            .width(140.dp)
-                            .padding(vertical = 24.dp),
-                        contentScale = ContentScale.FillWidth
-                    )
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_no_posts),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .width(140.dp)
+                                .padding(vertical = 24.dp),
+                            contentScale = ContentScale.FillWidth
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(80.dp))

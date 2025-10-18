@@ -162,7 +162,7 @@ fun ClubCreateScreen(
                     OutlinedButton(
                         onClick = { showDirectionsSheet = true }
                     ) {
-                        Text("Выбрать направления", style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
+                        Text("Выбрать направления", style = MaterialTheme.typography.labelLarge)
                     }
 
                     if (
@@ -177,7 +177,7 @@ fun ClubCreateScreen(
                             state.selectedDirections.forEach { dir ->
                                 androidx.compose.material3.AssistChip(
                                     onClick = { viewModel.onEvent(ClubCreateEvent.ToggleDirection(dir)) },
-                                    label = { Text(dir, color = Color.Black, style = androidx.compose.material3.MaterialTheme.typography.labelSmall) },
+                                    label = { Text(dir, color = Color.Black, style = MaterialTheme.typography.labelSmall) },
                                     colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                     ),
@@ -248,7 +248,7 @@ fun ClubCreateScreen(
                                     }
                                 }
                                 Spacer(Modifier.height(16.dp))
-                                OutlinedButton(onClick = { showDirectionsSheet = false }, modifier = Modifier.fillMaxWidth()) { Text("Готово", style = androidx.compose.material3.MaterialTheme.typography.labelLarge) }
+                                OutlinedButton(onClick = { showDirectionsSheet = false }, modifier = Modifier.fillMaxWidth()) { Text("Готово", style = MaterialTheme.typography.labelLarge) }
                             }
                         }
                     }
