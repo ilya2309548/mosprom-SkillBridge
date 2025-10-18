@@ -41,13 +41,12 @@ fun ProfileView(
 ) {
     Column(
         modifier = modifier
+            .background(Color.White)
             .padding(innerPadding)
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(12.dp))
-
         // Аватар и имя
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -111,7 +110,12 @@ fun ProfileView(
             ).forEach {
                 AssistChip(
                     onClick = { },
-                    label = { Text(it) }
+                    label = {
+                        Text(
+                            text = it,
+                            color = Color.Black
+                        )
+                    }
                 )
             }
         }

@@ -46,7 +46,6 @@ fun MosPromApp() {
                     ProfileScreen(
                         innerPadding = innerPadding,
                         navController = navController,
-                        viewModel = ProfileViewModel(),
                     )
                 }
 

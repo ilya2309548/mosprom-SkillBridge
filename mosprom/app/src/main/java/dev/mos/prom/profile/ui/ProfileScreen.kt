@@ -33,40 +33,41 @@ fun ProfileScreen (
         viewModel.onEvent(ProfileEvent.OnLoadData)
     }
 
-    Scaffold (
-        bottomBar = {
-            MosPromBottomBar(
-                navController = navController
-            )
-        },
-        topBar = {
-            MosPromTopBar(
-                title = state.userModel.name,
-            )
-        },
-        modifier = Modifier
-            .fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.onSurface,
-    ) { padding ->
+    when (state.status) {
 
-        when (state.status) {
-            is MosPromResult.Error -> {
-                MosPromErrorMessage(
-                    modifier = Modifier
-                        .padding(padding),
-                    text = "Ошибка загрузки",
-                    onUpdate = {
-                        viewModel.onEvent(ProfileEvent.OnLoadData)
-                    }
-                )
-            }
-            is MosPromResult.Loading -> {
-                MosPromLoadingBar(
-                    modifier = Modifier
-                        .padding(padding)
-                )
-            }
-            is MosPromResult.Success -> {
+        MosPromResult.Error -> {
+            MosPromErrorMessage(
+                modifier = Modifier
+                    .padding(innerPadding),
+                text = "Ошибка загрузки",
+                onUpdate = {
+                    viewModel.onEvent(ProfileEvent.OnLoadData)
+                }
+            )
+        }
+        MosPromResult.Loading -> {
+            MosPromLoadingBar(
+                modifier = Modifier
+                    .padding(innerPadding)
+            )
+        }
+        MosPromResult.Success -> {
+            Scaffold (
+                bottomBar = {
+                    MosPromBottomBar(
+                        navController = navController
+                    )
+                },
+                topBar = {
+                    MosPromTopBar(
+                        title = "Профиль",
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxSize(),
+                containerColor = MaterialTheme.colorScheme.onSurface,
+            ) { padding ->
+
                 ProfileView(
                     modifier = Modifier
                         .padding(padding),

@@ -2,10 +2,13 @@ package dev.mos.prom.profile.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.mos.prom.profile.UserModel
 import dev.mos.prom.utils.MosPromResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -25,12 +28,16 @@ class ProfileViewModel() : ViewModel() {
 
     private fun loadData() {
         viewModelScope.launch {
-            println("🔹 Loading start") // 👈 добавить
             delay(timeMillis = 2000L)
             _state.update {
-                it.copy(status = MosPromResult.Success)
+                it.copy(
+                    userModel = UserModel(
+                        name = "Иван Иванов",
+                        tg = "ivan@example.com"
+                    ),
+                    status = MosPromResult.Success
+                )
             }
-            println("✅ Updated state to Success") // 👈 добавить
         }
     }
 

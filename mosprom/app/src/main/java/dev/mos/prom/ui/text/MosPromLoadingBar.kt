@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,7 +28,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 fun MosPromLoadingBar (
     modifier: Modifier
 ) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("loading.json"))
+    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("dino.json"))
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever,
@@ -34,7 +36,7 @@ fun MosPromLoadingBar (
 
     val jokes = listOf(
         "Наташа мечтала о браке с Андреем, \n" +
-                "но Андрей был инженером ОТК \u2028и брака допустить не мог."
+                "но Андрей был инженером ОТК и брака допустить не мог."
     )
 
     val randomJoke = jokes.random()
@@ -53,7 +55,7 @@ fun MosPromLoadingBar (
                 progress
             },
             modifier = modifier
-                .fillMaxSize()
+                .height(400.dp)
         )
 
         Text(
@@ -61,7 +63,7 @@ fun MosPromLoadingBar (
                 .fillMaxWidth()
                 .padding(top = 16.dp, bottom = 8.dp),
             text = randomJoke,
-            color = MaterialTheme.colorScheme.surfaceContainer,
+            color = Color.Black,
             fontWeight = FontWeight.W400,
             fontSize = 14.sp,
             lineHeight = 20.sp,

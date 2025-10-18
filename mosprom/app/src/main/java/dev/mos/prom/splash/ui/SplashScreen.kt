@@ -27,7 +27,7 @@ fun SplashScreen (
     }
 
     when (state.status) {
-        is MosPromResult.Error -> {
+        MosPromResult.Error -> {
             MosPromErrorMessage(
                 text = "Не удалось загрузить данные",
                 onUpdate = {
@@ -36,12 +36,12 @@ fun SplashScreen (
                 modifier = Modifier,
             )
         }
-        is MosPromResult.Loading -> {
+        MosPromResult.Loading -> {
             SplashView(
                 innerPadding = innerPadding
             )
         }
-        is MosPromResult.Success -> {
+        MosPromResult.Success -> {
             LaunchedEffect(Unit) {
                 navController.navigate(Route.Profile) {
                     popUpTo(Route.Splash) {

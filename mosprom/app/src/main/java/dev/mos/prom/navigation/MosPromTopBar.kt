@@ -29,7 +29,7 @@ fun MosPromTopBar (
             .fillMaxWidth()
             .background(Color.White)
             .systemBarsPadding()
-            .padding(start = 8.dp, end = 8.dp, top = 4.dp)
+            .padding(start = 8.dp, end = 8.dp)
     ) {
         // Title по центру
         Text(
