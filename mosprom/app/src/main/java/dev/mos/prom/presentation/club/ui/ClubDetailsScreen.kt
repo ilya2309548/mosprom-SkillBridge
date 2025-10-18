@@ -29,6 +29,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -41,16 +42,21 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import dev.mos.prom.R
+import dev.mos.prom.presentation.club.viewmodel.ClubDetailsEvent
+import dev.mos.prom.presentation.club.viewmodel.ClubDetailsViewModel
 import dev.mos.prom.utils.navigation.MosPromTopBar
 import dev.mos.prom.utils.placeholderPainter
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ClubDetailsScreen(
     navController: NavController,
     innerPadding: PaddingValues,
+    viewModel: ClubDetailsViewModel = koinViewModel(),
     id: Long,
     name: String? = null,
     logoUrl: String? = null,
@@ -60,6 +66,9 @@ fun ClubDetailsScreen(
     var tabIndex by remember { mutableIntStateOf(0) }
     val scroll = rememberScrollState()
 
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(id) { viewModel.onEvent(ClubDetailsEvent.Load(id)) }
     val clubName = name ?: "Клуб #$id"
     val uiLogo = logoUrl
     val uiDescription = description ?: "Описание клуба. Здесь краткая информация о деятельности, целях и задачах клуба."
@@ -77,6 +86,7 @@ fun ClubDetailsScreen(
             )
         },
         containerColor = MaterialTheme.colorScheme.onSurface,
+
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -85,9 +95,15 @@ fun ClubDetailsScreen(
                     .padding(16.dp)
                     .navigationBarsPadding(),
             ) {
-                Button(onClick = { /* TODO subscribe */ },
-                    modifier = Modifier.align(Alignment.Center)) {
-                    Text("Подписаться")
+                Button(
+                    onClick = { viewModel.onEvent(ClubDetailsEvent.Subscribe(id)) },
+                    enabled = !state.isSubscribing && !state.subscribed,
+                    modifier = Modifier.align(Alignment.Center)
+                ) {
+                    Text(
+                        if (state.subscribed) "Подписаны" else "Подписаться",
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
             }
         }
@@ -100,7 +116,10 @@ fun ClubDetailsScreen(
                 .verticalScroll(scroll)
                 .padding(horizontal = 16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 12.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 12.dp)
+            ) {
                 if (!uiLogo.isNullOrEmpty()) {
                     AsyncImage(
                         model = uiLogo,
@@ -120,10 +139,14 @@ fun ClubDetailsScreen(
                             .clip(CircleShape)
                     )
                 }
+
                 Spacer(Modifier.size(12.dp))
+
                 Column(Modifier.weight(1f)) {
                     Text(clubName, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = Color.Black)
+
                     Spacer(Modifier.height(6.dp))
+
                     if (uiDirections.isNotEmpty()) {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             uiDirections.forEach { d ->
@@ -142,7 +165,25 @@ fun ClubDetailsScreen(
             }
 
             Spacer(Modifier.height(16.dp))
+
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Участников: ${state.membersCount}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black,
+                )
+                Spacer(Modifier.width(16.dp))
+
+            }
+
+            Spacer(Modifier.height(16.dp))
+
             Text("Описание", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+
             Text(uiDescription, style = MaterialTheme.typography.bodyMedium, color = Color.Black, modifier = Modifier.padding(top = 6.dp))
 
             Spacer(Modifier.height(16.dp))

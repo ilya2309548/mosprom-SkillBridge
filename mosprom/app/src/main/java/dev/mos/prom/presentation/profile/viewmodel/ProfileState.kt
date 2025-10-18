@@ -11,4 +11,5 @@ data class ProfileState (
     val status: MosPromResult = MosPromResult.Loading,
     val error: String? = null,
     val loggedOut: Boolean = false,
+    val clubsCount: Int = 0,
 )

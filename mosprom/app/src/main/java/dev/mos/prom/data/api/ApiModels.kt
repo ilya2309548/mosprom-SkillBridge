@@ -31,11 +31,11 @@ data class UserDto(
     val name: String? = null,
     val description: String? = null,
     val photo: String? = null,
-    @SerialName("achievements") val achievements: List<String> = emptyList(),
+    @SerialName("achievements") val achievements: List<String>? = emptyList(),
     @SerialName("events_count") val eventsCount: Int = 0,
     val university: String? = null,
-    val technologies: List<TechnologyDto> = emptyList(),
-    val directions: List<DirectionDto> = emptyList(),
+    val technologies: List<TechnologyDto>? = emptyList(),
+    val directions: List<DirectionDto>? = emptyList(),
 )
 
 @Serializable

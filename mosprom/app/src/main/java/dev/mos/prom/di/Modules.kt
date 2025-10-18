@@ -14,6 +14,7 @@ import dev.mos.prom.presentation.auth.viewmodel.RegisterViewModel
 import dev.mos.prom.presentation.profile.viewmodel.ProfileViewModel
 import dev.mos.prom.presentation.splash.viewmodel.SplashViewModel
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateViewModel
+import dev.mos.prom.presentation.club.viewmodel.ClubDetailsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -44,4 +45,5 @@ val modules = module {
     viewModelOf(::RegisterViewModel)
     viewModelOf(::ClubCreateViewModel)
     viewModelOf(::SearchViewModel)
+    viewModelOf(::ClubDetailsViewModel)
 }

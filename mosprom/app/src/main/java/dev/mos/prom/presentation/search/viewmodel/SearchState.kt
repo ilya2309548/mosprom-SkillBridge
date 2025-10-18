@@ -1,6 +1,6 @@
 package dev.mos.prom.presentation.search.viewmodel
 
-import dev.mos.prom.data.repo.Club
+import dev.mos.prom.data.model.Club
 import dev.mos.prom.utils.MosPromResult
 
 data class SearchState(

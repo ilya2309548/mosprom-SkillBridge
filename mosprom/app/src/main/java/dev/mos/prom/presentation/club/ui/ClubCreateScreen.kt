@@ -49,7 +49,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import dev.mos.prom.R
-import dev.mos.prom.utils.placeholderPainter
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateEvent
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateViewModel
 import dev.mos.prom.presentation.ui.components.MosTextField
@@ -57,6 +56,8 @@ import dev.mos.prom.presentation.ui.text.MosPromErrorMessage
 import dev.mos.prom.presentation.ui.text.MosPromLoadingBar
 import dev.mos.prom.utils.MosPromResult
 import dev.mos.prom.utils.navigation.MosPromTopBar
+import dev.mos.prom.utils.navigation.Route
+import dev.mos.prom.utils.placeholderPainter
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +79,7 @@ fun ClubCreateScreen(
         MosPromResult.Success -> {
             if (state.created) {
                 LaunchedEffect(Unit) {
-                    navController.popBackStack()
+                    navController.navigate(Route.Search)
                 }
             }
             Scaffold(

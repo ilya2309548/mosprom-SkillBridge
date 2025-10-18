@@ -36,6 +36,7 @@ class KtorClientProvider(
                         isLenient = true
                         prettyPrint = false
                         encodeDefaults = true
+                        coerceInputValues = true
                     }
                 )
             }

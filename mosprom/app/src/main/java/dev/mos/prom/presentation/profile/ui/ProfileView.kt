@@ -102,7 +102,7 @@ fun ProfileView(
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("3 проекта", style = MaterialTheme.typography.bodySmall, color = Color.Black)
                     Text("12 событий", style = MaterialTheme.typography.bodySmall, color = Color.Black)
-                    Text("102 клуба", style = MaterialTheme.typography.bodySmall, color = Color.Black)
+                    Text("${state.clubsCount} клуба", style = MaterialTheme.typography.bodySmall, color = Color.Black)
                 }
             }
         }

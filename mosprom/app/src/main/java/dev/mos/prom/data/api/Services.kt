@@ -12,6 +12,7 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.ContentType
+import io.ktor.client.request.delete
 
 class AuthService(private val client: HttpClient) {
     suspend fun login(req: LoginRequest): LoginResponse =
@@ -29,6 +30,7 @@ class AuthService(private val client: HttpClient) {
 
 class ProfileService(private val client: HttpClient) {
     suspend fun me(): UserDto = client.get("/me").body()
+    suspend fun myClubs(): List<ClubDto> = client.get("/me/clubs").body()
 
     suspend fun updateProfile(
         name: String?,
@@ -105,4 +107,11 @@ class ClubService(private val client: HttpClient) {
             )
         }.body<Map<String, String>>()
             .getValue("logo")
+
+    suspend fun subscribe(clubId: Long) {
+        client.post("/clubs/id/$clubId/subscribe") {}
+    }
+
+    suspend fun subscribers(clubId: Long): List<UserDto> =
+        client.get("/clubs/id/$clubId/subscribers").body()
 }

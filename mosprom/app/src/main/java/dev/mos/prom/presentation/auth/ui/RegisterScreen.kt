@@ -40,19 +40,28 @@ fun RegisterScreen(
     }
 
     Column(Modifier.padding(innerPadding).padding(16.dp)) {
-        MosTextField(label = "Telegram*", value = state.telegram, onValueChange = { viewModel.onEvent(RegisterEvent.TelegramChanged(it)) })
+        MosTextField(
+            label = "Telegram*",
+            value = state.telegram,
+            onValueChange = { viewModel.onEvent(RegisterEvent.TelegramChanged(it)) })
+
         Spacer(Modifier.height(12.dp))
+
+        MosTextField(label = "ФИО*", value = state.name, onValueChange = { viewModel.onEvent(RegisterEvent.NameChanged(it)) })
+
+        Spacer(Modifier.height(12.dp))
+
         MosTextField(
             label = "Пароль*",
             value = state.password,
             onValueChange = { viewModel.onEvent(RegisterEvent.PasswordChanged(it)) },
             visualTransformation = PasswordVisualTransformation()
         )
-        Spacer(Modifier.height(12.dp))
-        MosTextField(label = "ФИО*", value = state.name, onValueChange = { viewModel.onEvent(RegisterEvent.NameChanged(it)) })
+
         Button(onClick = { viewModel.onEvent(RegisterEvent.Submit) }, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
             Text("Создать аккаунт", style = androidx.compose.material3.MaterialTheme.typography.labelLarge)
         }
+
         if (state.status == MosPromResult.Error) {
             Text("Ошибка: ${state.errorMessage ?: "неизвестно"}", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
         }

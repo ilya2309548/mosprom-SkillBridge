@@ -1,5 +1,6 @@
 package dev.mos.prom.presentation.search.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,21 +12,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -95,7 +95,8 @@ fun SearchScreen(
                             Modifier.weight(1f)
                         ) {
                             MosTextField(
-                                label = "Поиск",
+                                label = null,
+                                placeholder = "Мамкины программисты",
                                 value = state.query,
                                 onValueChange = { viewModel.onEvent(SearchEvent.QueryChanged(it)) },
                                 modifier = Modifier.fillMaxWidth()
@@ -125,9 +126,15 @@ fun SearchScreen(
                             state.selectedDirections.forEach { dir ->
                                 androidx.compose.material3.AssistChip(
                                     onClick = { viewModel.onEvent(SearchEvent.ToggleDirection(dir)) },
-                                    label = { Text(dir, color = Color.Black, style = MaterialTheme.typography.labelSmall) },
+                                    label = {
+                                        Text(
+                                            text = dir,
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    },
                                     colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        containerColor = MaterialTheme.colorScheme.primary,
                                     ),
                                     border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.25f))
                                 )
@@ -136,6 +143,7 @@ fun SearchScreen(
                     }
 
                     Spacer(Modifier.height(16.dp))
+
                     state.visibleClubs.forEach { club ->
                         Card(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
@@ -190,26 +198,47 @@ fun SearchScreen(
                         }
                     }
                     if (showDirectionsSheet) {
-                        ModalBottomSheet(onDismissRequest = { showDirectionsSheet = false }) {
+                        ModalBottomSheet(
+                            onDismissRequest = { showDirectionsSheet = false }
+                        ) {
                             Column(Modifier.padding(16.dp)) {
+
                                 Text("Выберите направления", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+
                                 Spacer(Modifier.height(12.dp))
+
                                 FlowRow(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     state.directions.forEach { dir ->
                                         val selected = dir in state.selectedDirections
+
                                         androidx.compose.material3.AssistChip(
-                                            onClick = { viewModel.onEvent(SearchEvent.ToggleDirection(dir)) },
-                                            label = { Text(dir, color = if (selected) Color.White else Color.Black, style = MaterialTheme.typography.labelSmall) },
+                                            onClick = {
+                                                viewModel.onEvent(
+                                                    SearchEvent.ToggleDirection(dir)
+                                                ) },
+                                            label = {
+                                                Text(
+                                                    text = dir,
+                                                    color =
+                                                        if (selected) Color.White
+                                                        else Color.Black,
+                                                    style = MaterialTheme.typography.labelSmall
+                                                )
+                                            },
                                             colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
-                                                containerColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                                containerColor =
+                                                    if (selected) MaterialTheme.colorScheme.primary
+                                                    else Color.White,
                                             )
                                         )
                                     }
                                 }
+
                                 Spacer(Modifier.height(16.dp))
+
                                 OutlinedButton(onClick = { showDirectionsSheet = false }, modifier = Modifier.fillMaxWidth()) {
                                     Text("Готово", style = MaterialTheme.typography.labelLarge)
                                 }

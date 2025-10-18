@@ -2,7 +2,7 @@ package dev.mos.prom.presentation.search.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.mos.prom.data.repo.Club
+import dev.mos.prom.data.model.Club
 import dev.mos.prom.data.repo.ClubRepository
 import dev.mos.prom.utils.MosPromResult
 import kotlinx.coroutines.Job
@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SearchViewModel(private val repo: ClubRepository) : ViewModel() {
+class SearchViewModel(
+    private val repo: ClubRepository
+) : ViewModel() {
+
     private val _state = MutableStateFlow(SearchState())
     val state: StateFlow<SearchState> = _state
 
@@ -104,4 +107,5 @@ class SearchViewModel(private val repo: ClubRepository) : ViewModel() {
         val q = query.trim().lowercase()
         return clubs.filter { it.name.lowercase().contains(q) }
     }
+
 }

@@ -31,7 +31,8 @@ class ProfileViewModel(
             _state.update { it.copy(status = MosPromResult.Loading, error = null) }
             try {
                 val me = repo.me()
-                _state.update { it.copy(userModel = me, status = MosPromResult.Success) }
+                val clubs = repo.myClubsCount()
+                _state.update { it.copy(userModel = me, clubsCount = clubs, status = MosPromResult.Success) }
             } catch (t: Throwable) {
                 _state.update { it.copy(status = MosPromResult.Error, error = t.message) }
             }
