@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -20,16 +21,15 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun MosPromTopBar (
     title: String,
-    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
     navIcon: (@Composable () -> Unit)? = null,
     actions: (@Composable () -> Unit)? = null,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(containerColor)
+            .background(Color.White)
             .systemBarsPadding()
-            .padding(start = 8.dp, end = 8.dp, top = 4.dp)
+            .padding(start = 8.dp, end = 8.dp)
     ) {
         // Title по центру
         Text(
@@ -37,7 +37,7 @@ fun MosPromTopBar (
             fontWeight = FontWeight.W400,
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.inverseOnSurface,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.align(Alignment.Center)
         )
 
