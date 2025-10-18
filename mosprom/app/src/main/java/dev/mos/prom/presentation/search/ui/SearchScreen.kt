@@ -1,6 +1,7 @@
 package dev.mos.prom.presentation.search.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -38,6 +39,7 @@ import dev.mos.prom.presentation.ui.text.MosPromLoadingBar
 import dev.mos.prom.utils.MosPromResult
 import dev.mos.prom.utils.navigation.MosPromBottomBar
 import dev.mos.prom.utils.navigation.MosPromTopBar
+import dev.mos.prom.utils.navigation.Route
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -78,7 +80,7 @@ fun SearchScreen(
                     )
 
                     Spacer(Modifier.height(12.dp))
-                    Text("Направления", color = Color.Black)
+                    Text("Направления", color = Color.Black, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -101,7 +103,8 @@ fun SearchScreen(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 8.dp)
+                                .padding(bottom = 12.dp)
+                                .clickable { navController.navigate("club/${'$'}{club.id}") }
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -120,7 +123,7 @@ fun SearchScreen(
                                 Spacer(Modifier.width(12.dp))
 
                                 Column(Modifier.weight(1f)) {
-                                    Text(club.name, color = Color.Black)
+                                    Text(club.name, color = Color.Black, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
                                     Spacer(Modifier.height(6.dp))
                                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                         club.directions.forEach { d ->

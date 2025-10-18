@@ -34,7 +34,7 @@ fun EditProfileScreen(
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    // Ensure data is loaded when entering the screen
+
     LaunchedEffect(Unit) {
         viewModel.onEvent(ProfileEvent.OnLoadData)
     }
@@ -51,16 +51,23 @@ fun EditProfileScreen(
                 topBar = { MosPromTopBar(title = "Редактировать профиль") },
                 containerColor = MaterialTheme.colorScheme.onSurface
             ) { padding ->
+
                 var name by remember(state.userModel.name) { mutableStateOf(state.userModel.name) }
                 var description by remember(state.userModel.description) { mutableStateOf(state.userModel.description) }
-                var university by remember(state.userModel.university) { mutableStateOf(state.userModel.university) }
-                var education by remember(state.userModel.education) { mutableStateOf(state.userModel.education) }
+                var university by remember(state.userModel.education) { mutableStateOf(state.userModel.education) }
                 var lastSubmitted by remember { mutableStateOf(false) }
 
-                Column(Modifier.padding(padding).padding(16.dp)) {
+                Column(
+                    Modifier
+                        .padding(padding)
+                        .padding(16.dp)
+                ) {
                     MosTextField(label = "ФИО", value = name, onValueChange = { name = it })
+
                     MosTextField(label = "О себе", value = description, onValueChange = { description = it }, modifier = Modifier.padding(top = 12.dp))
+
                     MosTextField(label = "Образование", value = university, onValueChange = { university = it }, modifier = Modifier.padding(top = 12.dp))
+
                     Button(
                         onClick = {
                             lastSubmitted = true

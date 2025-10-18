@@ -35,5 +35,6 @@ sealed interface Route {
     @Serializable
     data object Register : Route
 
+    // Typed destination for a club details screen would normally carry an id argument.
 
 }

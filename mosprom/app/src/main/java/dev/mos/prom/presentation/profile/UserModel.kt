@@ -7,8 +7,7 @@ data class UserModel (
     val name: String,
     val tg: String,
     val description: String = "",
-    val university: String = "", // используем как "работа" в текущем UI
-    val education: String = "",  // поле для отображения образования
+    val education: String = "",
     val achievements: List<String> = emptyList(),
     val photoUrl: String? = null,
     val directions: List<String> = emptyList(),

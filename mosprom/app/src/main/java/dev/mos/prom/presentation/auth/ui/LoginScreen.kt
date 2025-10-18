@@ -32,7 +32,7 @@ fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snack: SnackbarHostState = SnackbarHostState()
+    val snack = SnackbarHostState()
 
     LaunchedEffect(state.isFinished) {
         if (state.isFinished) {

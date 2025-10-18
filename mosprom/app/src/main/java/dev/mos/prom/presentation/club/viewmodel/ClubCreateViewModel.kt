@@ -3,41 +3,12 @@ package dev.mos.prom.presentation.club.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.mos.prom.data.repo.ClubRepository
+import dev.mos.prom.presentation.ClubItem
 import dev.mos.prom.utils.MosPromResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-data class ClubCreateState(
-    val name: String = "",
-    val description: String = "",
-    val directions: List<String> = emptyList(), // all
-    val selectedDirections: Set<String> = emptySet(),
-    val existingClubs: List<ClubItem> = emptyList(),
-    val logoBytes: ByteArray? = null,
-    val logoFilename: String? = null,
-    val logoMime: String? = null,
-    val status: MosPromResult = MosPromResult.Loading,
-    val error: String? = null,
-    val created: Boolean = false,
-)
-
-data class ClubItem(
-    val id: Long,
-    val name: String,
-    val description: String,
-    val logoUrl: String?,
-)
-
-sealed interface ClubCreateEvent {
-    data object OnLoad : ClubCreateEvent
-    data class NameChanged(val v: String): ClubCreateEvent
-    data class DescriptionChanged(val v: String): ClubCreateEvent
-    data class ToggleDirection(val name: String): ClubCreateEvent
-    data class SetLogo(val filename: String, val bytes: ByteArray, val mime: String): ClubCreateEvent
-    data object Submit: ClubCreateEvent
-}
 
 class ClubCreateViewModel(private val repo: ClubRepository): ViewModel() {
     private val _state = MutableStateFlow(ClubCreateState())
@@ -72,9 +43,20 @@ class ClubCreateViewModel(private val repo: ClubRepository): ViewModel() {
                 if (contains(name)) remove(name) else add(name)
             }
             _state.update { it.copy(selectedDirections = newSel) }
+
             try {
                 val clubs = repo.clubsByDirections(newSel.toList())
-                _state.update { it.copy(existingClubs = clubs.map { c -> ClubItem(c.id, c.name, c.description, c.logoUrl) }) }
+                _state.update {
+                    it.copy(existingClubs = clubs.map { c ->
+                            ClubItem(
+                                c.id,
+                                c.name,
+                                c.description,
+                                c.logoUrl
+                            )
+                        }
+                    )
+                }
             } catch (t: Throwable) {
                 _state.update { it.copy(error = t.message) }
             }

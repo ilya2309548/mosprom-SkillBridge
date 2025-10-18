@@ -34,8 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import dev.mos.prom.R
-import dev.mos.prom.presentation.profile.ui.components.AchievementChip
-import dev.mos.prom.presentation.profile.ui.components.SectionHeader
+import dev.mos.prom.presentation.ui.text.AchievementChip
+import dev.mos.prom.presentation.ui.text.SectionHeader
 import dev.mos.prom.presentation.profile.viewmodel.ProfileState
 import java.io.InputStream
 
@@ -115,15 +115,15 @@ fun ProfileView(
         SectionHeader("О себе")
         Text(state.userModel.description.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
 
-        SectionHeader("Образование")
-        Text(state.userModel.university.ifBlank { "—" }, fontWeight = FontWeight.Bold, color = Color.Black)
+    SectionHeader("Образование")
+    Text(state.userModel.education.ifBlank { "—" }, fontWeight = FontWeight.Bold, color = Color.Black)
 
         SectionHeader("Направления")
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            state.userModel.achievements.ifEmpty { listOf("—") }.forEach {
+            (state.userModel.directions.ifEmpty { listOf("—") }).forEach {
                 AssistChip(
                     onClick = { },
                     label = {
@@ -147,10 +147,8 @@ fun ProfileView(
         }
 
         SectionHeader("Проекты")
-    Text("—", fontWeight = FontWeight.Bold, color = Color.Black)
+        Text("—", fontWeight = FontWeight.Bold, color = Color.Black)
 
-        TextButton(onClick = { /* читать подробнее */ }) {
-            Text("Читать", color = Color.Black)
-        }
+
     }
 }

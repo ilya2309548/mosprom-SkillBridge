@@ -1,4 +1,4 @@
-package dev.mos.prom.presentation.profile.ui.components
+package dev.mos.prom.presentation.ui.text
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
