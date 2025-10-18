@@ -1,12 +1,12 @@
 package dev.mos.prom.presentation.club.ui
 
+import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -19,13 +19,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,11 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import dev.mos.prom.R
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateEvent
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateViewModel
@@ -107,7 +111,19 @@ fun ClubCreateScreen(
                                 .clickable { pickLogo.launch("image/*") },
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(painter = painterResource(R.drawable.ic_avatar_placeholder), contentDescription = null)
+                            val bytes = state.logoBytes
+                            if (bytes != null) {
+                                val bmp = remember(bytes) { BitmapFactory.decodeByteArray(bytes, 0, bytes.size) }
+                                if (bmp != null) {
+                                    androidx.compose.foundation.Image(
+                                        bitmap = bmp.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+                            } else {
+                                Icon(painter = painterResource(R.drawable.ic_avatar_placeholder), contentDescription = null)
+                            }
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
@@ -136,7 +152,8 @@ fun ClubCreateScreen(
                                     label = { Text(dir, color = Color.Black) },
                                     colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    )
+                                    ),
+                                    border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.25f))
                                 )
                             }
                         }
@@ -148,20 +165,32 @@ fun ClubCreateScreen(
                             Text("Вы будете первый, кто откроет клуб по этому направлению", color = Color.Black)
                         } else {
                             state.existingClubs.forEach { c ->
-                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                                     .fillMaxWidth()
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .padding(12.dp)) {
-                                    Box(
+                                    .padding(12.dp)
+                                ) {
+//                                    Box(
+//                                        modifier = Modifier
+//                                            .size(40.dp)
+//                                            .clip(CircleShape)
+//                                            .background(MaterialTheme.colorScheme.primary)
+//                                    ) {}
+
+                                    AsyncImage(
+                                        model = c.logoUrl,
+                                        contentDescription = null,
                                         modifier = Modifier
-                                            .size(40.dp)
                                             .clip(CircleShape)
-                                            .background(MaterialTheme.colorScheme.primary)
-                                    ) {}
+                                            .size(44.dp)
+                                    )
+
                                     Spacer(Modifier.width(12.dp))
+
                                     Column(Modifier.weight(1f)) {
                                         Text(c.name, fontWeight = FontWeight.SemiBold, color = Color.Black)
-                                        Text("${'$'}{c.description}", color = Color.Black.copy(alpha = 0.7f))
+                                        Text(c.description, color = Color.Black.copy(alpha = 0.7f))
                                     }
                                 }
                                 Spacer(Modifier.height(8.dp))

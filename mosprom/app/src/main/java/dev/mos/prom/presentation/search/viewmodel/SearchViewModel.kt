@@ -23,6 +23,7 @@ class SearchViewModel(private val repo: ClubRepository) : ViewModel() {
             SearchEvent.OnLoad -> initialLoad()
             is SearchEvent.QueryChanged -> applyQuery(event.value)
             is SearchEvent.ToggleDirection -> toggleDirection(event.name)
+            SearchEvent.DoSearch -> doSearch()
             SearchEvent.Retry -> initialLoad()
         }
     }
@@ -50,18 +51,21 @@ class SearchViewModel(private val repo: ClubRepository) : ViewModel() {
 
     private fun applyQuery(value: String) {
         _state.update { it.copy(query = value) }
-        // On each query change, request fresh clubs by current selected directions, then filter by name locally
+    }
+
+    private fun doSearch() {
         queryJob?.cancel()
         queryJob = viewModelScope.launch {
             try {
                 _state.update { it.copy(status = MosPromResult.Loading, error = "") }
                 val dirs = _state.value.selectedDirections.toList()
-                val clubs = repo.searchClubs(name = value, directions = dirs)
+                val q = _state.value.query
+                val clubs = repo.searchClubs(name = q, directions = dirs)
                 _state.update { s ->
                     s.copy(
                         status = MosPromResult.Success,
                         clubs = clubs,
-                        visibleClubs = filter(clubs, value)
+                        visibleClubs = filter(clubs, q)
                     )
                 }
             } catch (t: Throwable) {
