@@ -33,7 +33,7 @@ class SearchViewModel(private val repo: ClubRepository) : ViewModel() {
             _state.update { it.copy(status = MosPromResult.Loading, error = "") }
             try {
                 val dirs = repo.directions()
-                val clubs = repo.clubsByDirections(emptyList())
+                val clubs = repo.searchClubs(name = null, directions = emptyList())
                 _state.update { s ->
                     s.copy(
                         status = MosPromResult.Success,
@@ -56,7 +56,7 @@ class SearchViewModel(private val repo: ClubRepository) : ViewModel() {
             try {
                 _state.update { it.copy(status = MosPromResult.Loading, error = "") }
                 val dirs = _state.value.selectedDirections.toList()
-                val clubs = repo.clubsByDirections(dirs)
+                val clubs = repo.searchClubs(name = value, directions = dirs)
                 _state.update { s ->
                     s.copy(
                         status = MosPromResult.Success,
@@ -81,7 +81,7 @@ class SearchViewModel(private val repo: ClubRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 _state.update { it.copy(status = MosPromResult.Loading, error = "") }
-                val clubs = repo.clubsByDirections(newSet.toList())
+                val clubs = repo.searchClubs(name = _state.value.query, directions = newSet.toList())
                 _state.update { s ->
                     s.copy(
                         status = MosPromResult.Success,

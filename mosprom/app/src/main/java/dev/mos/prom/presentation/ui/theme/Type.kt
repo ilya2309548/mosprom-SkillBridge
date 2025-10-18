@@ -2,26 +2,16 @@ package dev.mos.prom.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.googlefonts.GoogleFont
-import androidx.compose.ui.text.googlefonts.GoogleFont.Provider
-import androidx.compose.ui.text.googlefonts.Font as GFont
 import androidx.compose.ui.unit.sp
 import dev.mos.prom.R
 
-private val provider = Provider(
-    providerAuthority = "com.google.android.gms.fonts",
-    providerPackage = "com.google.android.gms",
-    certificates = R.array.com_google_android_gms_fonts_certs
-)
-
-private val nunitoName = GoogleFont("Nunito")
-
 private val Nunito = FontFamily(
-    GFont(googleFont = nunitoName, fontProvider = provider, weight = FontWeight.Light),
-    GFont(googleFont = nunitoName, fontProvider = provider, weight = FontWeight.Medium),
-    GFont(googleFont = nunitoName, fontProvider = provider, weight = FontWeight.Bold),
+    Font(R.font.nunito_light, weight = FontWeight.Light),
+    Font(R.font.nunito_medium, weight = FontWeight.Medium),
+    Font(R.font.nunito_bold, weight = FontWeight.Bold),
 )
 
 val MosTypography = Typography(

@@ -71,10 +71,13 @@ class ProfileService(private val client: HttpClient) {
 class ClubService(private val client: HttpClient) {
     suspend fun listDirections(): List<DirectionDto> = client.get("/directions").body()
 
-    suspend fun listClubsByDirections(directionNames: List<String>): List<ClubDto> {
-        val query = if (directionNames.isEmpty()) "" else directionNames.joinToString(",")
+    suspend fun listClubs(name: String?, directionNames: List<String>): List<ClubDto> {
+        val directionsQuery = if (directionNames.isEmpty()) "" else directionNames.joinToString(",")
         return client.get("/clubs") {
-            if (query.isNotBlank()) url { parameters.append("directions", query) }
+            url {
+                if (!name.isNullOrBlank()) parameters.append("name", name)
+                if (directionsQuery.isNotBlank()) parameters.append("directions", directionsQuery)
+            }
         }.body()
     }
 

@@ -34,8 +34,7 @@ fun MosPromTopBar (
         // Title по центру
         Text(
             text = title,
-            fontWeight = FontWeight.W400,
-            fontSize = 22.sp,
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.align(Alignment.Center)
