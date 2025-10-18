@@ -49,3 +49,19 @@ data class DirectionDto(
     val id: Long? = null,
     val name: String
 )
+
+@Serializable
+data class ClubDto(
+    val id: Long,
+    val name: String,
+    val logo: String? = null,
+    val description: String? = null,
+    val directions: List<DirectionDto> = emptyList(),
+)
+
+@Serializable
+data class CreateClubRequest(
+    val name: String,
+    val description: String,
+    val directions: List<String> = emptyList(),
+)

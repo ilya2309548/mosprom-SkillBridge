@@ -67,3 +67,39 @@ class ProfileService(private val client: HttpClient) {
             )
         }.body()
 }
+
+class ClubService(private val client: HttpClient) {
+    suspend fun listDirections(): List<DirectionDto> = client.get("/directions").body()
+
+    suspend fun listClubsByDirections(directionNames: List<String>): List<ClubDto> {
+        val query = if (directionNames.isEmpty()) "" else directionNames.joinToString(",")
+        return client.get("/clubs") {
+            if (query.isNotBlank()) url { parameters.append("directions", query) }
+        }.body()
+    }
+
+    suspend fun createClub(req: CreateClubRequest): ClubDto =
+        client.post("/clubs") {
+            contentType(ContentType.Application.Json)
+            setBody(req)
+        }.body()
+
+    suspend fun uploadClubLogo(clubId: Long, filename: String, bytes: ByteArray, mime: String = "image/jpeg"): String =
+        client.post("/clubs/$clubId/logo") {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append(
+                            key = "logo",
+                            value = bytes,
+                            headers = Headers.build {
+                                append(HttpHeaders.ContentType, mime)
+                                append(HttpHeaders.ContentDisposition, "filename=$filename")
+                            }
+                        )
+                    }
+                )
+            )
+        }.body<Map<String, String>>()
+            .getValue("logo")
+}

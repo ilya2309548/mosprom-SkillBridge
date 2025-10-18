@@ -14,6 +14,8 @@ import dev.mos.prom.presentation.auth.ui.LoginScreen
 import dev.mos.prom.presentation.auth.ui.RegisterScreen
 import dev.mos.prom.presentation.profile.ui.ProfileScreen
 import dev.mos.prom.presentation.profile.ui.EditProfileScreen
+import dev.mos.prom.presentation.club.ui.ClubCreateScreen
+import dev.mos.prom.presentation.search.ui.SearchScreen
 import dev.mos.prom.presentation.splash.ui.SplashScreen
 import dev.mos.prom.presentation.ui.theme.MospromTheme
 
@@ -35,6 +37,13 @@ fun MosPromApp() {
                     popEnterTransition = { slideInHorizontally() }
                 ) {
                     SplashScreen(
+                        navController = navController,
+                        innerPadding = innerPadding,
+                    )
+                }
+
+                composable<Route.Search> {
+                    SearchScreen(
                         navController = navController,
                         innerPadding = innerPadding,
                     )
@@ -69,6 +78,16 @@ fun MosPromApp() {
                     popEnterTransition = { slideInHorizontally() }
                 ) {
                     EditProfileScreen(
+                        innerPadding = innerPadding,
+                        navController = navController,
+                    )
+                }
+
+                composable<Route.CreatePost>(
+                    exitTransition = { slideOutHorizontally() },
+                    popEnterTransition = { slideInHorizontally() }
+                ) {
+                    ClubCreateScreen(
                         innerPadding = innerPadding,
                         navController = navController,
                     )

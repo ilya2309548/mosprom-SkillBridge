@@ -24,10 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,11 +47,9 @@ fun ProfileView(
     onUploadAvatar: (filename: String, bytes: ByteArray, mime: String) -> Unit = { _, _, _ -> },
 ) {
     val context = LocalContext.current
-    var pickedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
     val pickLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             val bytes = context.contentResolver.openInputStream(uri)?.use(InputStream::readBytes)
-            pickedImageBytes = bytes
             if (bytes != null) {
                 val mime = context.contentResolver.getType(uri) ?: "image/jpeg"
                 val name = uri.lastPathSegment?.substringAfterLast('/') ?: "avatar.jpg"

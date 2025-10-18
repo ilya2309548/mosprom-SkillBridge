@@ -3,13 +3,17 @@ package dev.mos.prom.di
 import dev.mos.prom.data.api.AuthService
 import dev.mos.prom.data.api.KtorClientProvider
 import dev.mos.prom.data.api.ProfileService
+import dev.mos.prom.data.api.ClubService
 import dev.mos.prom.data.repo.AuthRepository
 import dev.mos.prom.data.repo.ProfileRepository
+import dev.mos.prom.data.repo.ClubRepository
+import dev.mos.prom.presentation.search.viewmodel.SearchViewModel
 import dev.mos.prom.data.storage.TokenStorage
 import dev.mos.prom.presentation.auth.viewmodel.LoginViewModel
 import dev.mos.prom.presentation.auth.viewmodel.RegisterViewModel
 import dev.mos.prom.presentation.profile.viewmodel.ProfileViewModel
 import dev.mos.prom.presentation.splash.viewmodel.SplashViewModel
+import dev.mos.prom.presentation.club.viewmodel.ClubCreateViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -26,14 +30,18 @@ val modules = module {
     // Services
     single { AuthService(get()) }
     single { ProfileService(get()) }
+    single { ClubService(get()) }
 
     // Repositories
     single { AuthRepository(auth = get(), tokens = get()) }
     single { ProfileRepository(api = get()) }
+    single { ClubRepository(api = get()) }
 
     /* View Models */
     viewModelOf(::SplashViewModel)
     viewModelOf(::ProfileViewModel)
     viewModelOf(::LoginViewModel)
     viewModelOf(::RegisterViewModel)
+    viewModelOf(::ClubCreateViewModel)
+    viewModelOf(::SearchViewModel)
 }

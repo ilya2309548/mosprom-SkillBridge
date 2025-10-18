@@ -21,6 +21,11 @@ fun MosPromBottomBar (
 ) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
+    // Hide bottom bar on specific routes (e.g., CreatePost)
+    if (currentRoute?.contains(Route.CreatePost.toString()) == true) {
+        return
+    }
+
     BottomAppBar(
         containerColor = Color.White.copy(0.5f)
     ) {
