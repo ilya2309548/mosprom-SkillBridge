@@ -17,14 +17,21 @@ const docTemplate = `{
     "paths": {
         "/clubs": {
             "get": {
+                "description": "If name is provided, filter by exact club name. If directions provided (comma-separated), return clubs that have ALL these directions. If omitted, no filter by that field.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "clubs"
                 ],
-                "summary": "List clubs by directions",
+                "summary": "List clubs with optional name and directions filters",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Exact club name",
+                        "name": "name",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Comma-separated direction names",
@@ -653,9 +660,6 @@ const docTemplate = `{
         "model.Direction": {
             "type": "object",
             "properties": {
-                "club_id": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "integer"
                 },

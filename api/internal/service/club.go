@@ -1,7 +1,6 @@
 package service
 
 import (
-	"2gis-calm-map/api/internal/db"
 	"2gis-calm-map/api/internal/model"
 	"2gis-calm-map/api/internal/repository"
 )
@@ -31,12 +30,6 @@ func (s *ClubService) CreateClub(input CreateClubInput, creatorID uint) (model.C
 	if err := repository.CreateClub(&club); err != nil {
 		return model.Club{}, err
 	}
-	// set ClubID on directions if needed
-	if len(dirs) > 0 {
-		if err := db.DB.Model(&model.Direction{}).Where("id IN ?", idsOfDirections(dirs)).Update("club_id", club.ID).Error; err != nil {
-			return model.Club{}, err
-		}
-	}
 	return club, nil
 }
 
@@ -58,4 +51,8 @@ func (s *ClubService) ListByDirections(names []string) ([]model.Club, error) {
 
 func (s *ClubService) SetLogo(clubID uint, filename string) error {
 	return repository.SetClubLogo(clubID, filename)
+}
+
+func (s *ClubService) ListFiltered(name *string, directions []string) ([]model.Club, error) {
+	return repository.ListClubsFiltered(name, directions)
 }

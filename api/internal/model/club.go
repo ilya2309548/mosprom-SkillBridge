@@ -8,7 +8,7 @@ type Club struct {
 	Description string      `json:"description"`
 	CreatorID   uint        `json:"creator_id"`
 	Creator     *User       `json:"creator" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Directions  []Direction `json:"directions"`
+	Directions  []Direction `json:"directions" gorm:"many2many:club_directions;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Events      []Event     `json:"events"`
 }
 

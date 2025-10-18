@@ -112,13 +112,21 @@ func GetClubByName(c *gin.Context) {
 }
 
 // ListClubs godoc
-// @Summary List clubs by directions
+// @Summary List clubs with optional name and directions filters
+// @Description If name is provided, filter by exact club name. If directions provided (comma-separated), return clubs that have ALL these directions. If omitted, no filter by that field.
 // @Tags clubs
 // @Produce json
+// @Param name query string false "Exact club name"
 // @Param directions query string false "Comma-separated direction names"
 // @Success 200 {array} model.Club
 // @Router /clubs [get]
 func ListClubs(c *gin.Context) {
+	nameQ := strings.TrimSpace(c.Query("name"))
+	var namePtr *string
+	if nameQ != "" {
+		namePtr = &nameQ
+	}
+
 	dirs := c.Query("directions")
 	var names []string
 	if dirs != "" {
@@ -127,7 +135,8 @@ func ListClubs(c *gin.Context) {
 	for i := range names {
 		names[i] = strings.TrimSpace(names[i])
 	}
-	clubs, err := clubService.ListByDirections(names)
+
+	clubs, err := clubService.ListFiltered(namePtr, names)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

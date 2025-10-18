@@ -29,6 +29,5 @@ type Technology struct {
 type Direction struct {
 	ID           uint         `json:"id" gorm:"primaryKey"`
 	Name         string       `json:"name" gorm:"uniqueIndex;not null"`
-	ClubID       *uint        `json:"club_id"`
 	Technologies []Technology `json:"technologies" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
