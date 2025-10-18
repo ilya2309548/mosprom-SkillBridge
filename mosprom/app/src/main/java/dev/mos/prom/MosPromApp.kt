@@ -35,7 +35,6 @@ fun MosPromApp() {
                 ) {
                     SplashScreen(
                         navController = navController,
-                        viewModel = SplashViewModel(),
                         innerPadding = innerPadding,
                     )
                 }

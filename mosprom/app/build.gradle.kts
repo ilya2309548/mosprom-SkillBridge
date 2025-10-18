@@ -67,4 +67,7 @@ dependencies {
     // animation
     implementation(libs.lottie.compose)
 
+    // DI
+    api(libs.bundles.koin)
+
 }

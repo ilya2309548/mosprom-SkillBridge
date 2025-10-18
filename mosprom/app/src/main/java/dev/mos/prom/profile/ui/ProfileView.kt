@@ -40,7 +40,7 @@ fun ProfileView(
     innerPadding: PaddingValues,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(innerPadding)
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
@@ -49,7 +49,9 @@ fun ProfileView(
         Spacer(Modifier.height(12.dp))
 
         // Аватар и имя
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Icon(
                 painter = painterResource(R.drawable.ic_avatar_placeholder),
                 contentDescription = null,
@@ -60,10 +62,12 @@ fun ProfileView(
                     .padding(8.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
+
             Spacer(Modifier.width(12.dp))
+
             Column {
                 Text(
-                    text = "Венедиктов Павел",
+                    text = state.userModel.name,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Spacer(Modifier.height(4.dp))
