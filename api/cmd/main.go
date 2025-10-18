@@ -80,6 +80,17 @@ func main() {
 	// Public photos access by filename
 	r.GET("/photos/:filename", handler.GetPhotoByName)
 
+	// Clubs
+	r.GET("/clubs", handler.ListClubs)
+	r.GET("/clubs/:name", handler.GetClubByName)
+
+	clubAuth := r.Group("/clubs")
+	clubAuth.Use(middleware.JWTAuth())
+	{
+		clubAuth.POST("", handler.CreateClub)
+		clubAuth.POST(":id/logo", handler.SetClubLogo)
+	}
+
 	// Secured profile routes
 	auth := r.Group("/")
 	auth.Use(middleware.JWTAuth())

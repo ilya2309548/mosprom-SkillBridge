@@ -20,8 +20,19 @@ func Init(cfg *config.Config) {
 
 	log.Println("Database connected")
 
-	// MIGRATION: автоматически создаёт таблицы, если их нет
-	if err := DB.AutoMigrate(&model.Technology{}, &model.Direction{}, &model.User{}); err != nil {
+	// MIGRATION: порядок важен из-за внешних ключей
+	// 1) Club (родитель)
+	// 2) Event (ссылается на Club)
+	// 3) Direction (имеет FK на Club)
+	// 4) Technology (имеет FK на Direction)
+	// 5) User (создаёт join-таблицы для many2many c Technology/Direction)
+	if err := DB.AutoMigrate(
+		&model.Club{},
+		&model.Event{},
+		&model.Direction{},
+		&model.Technology{},
+		&model.User{},
+	); err != nil {
 		log.Fatal("failed to migrate database: ", err)
 	}
 
