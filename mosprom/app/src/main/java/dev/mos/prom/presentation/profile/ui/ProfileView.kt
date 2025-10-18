@@ -1,5 +1,7 @@
 package dev.mos.prom.presentation.profile.ui
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,11 +24,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,14 +41,6 @@ import dev.mos.prom.R
 import dev.mos.prom.presentation.profile.ui.components.AchievementChip
 import dev.mos.prom.presentation.profile.ui.components.SectionHeader
 import dev.mos.prom.presentation.profile.viewmodel.ProfileState
-import dev.mos.prom.presentation.profile.viewmodel.ProfileEvent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.net.toFile
 import java.io.InputStream
 
 @Composable
@@ -121,13 +119,10 @@ fun ProfileView(
 
         // Блоки
         SectionHeader("О себе")
-    Text(state.userModel.description.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-
-        SectionHeader("Работа")
-    Text(state.userModel.university.ifBlank { "—" }, fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(state.userModel.description.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
 
         SectionHeader("Образование")
-    Text("—", color = Color.Black)
+        Text(state.userModel.university.ifBlank { "—" }, fontWeight = FontWeight.Bold, color = Color.Black)
 
         SectionHeader("Направления")
         FlowRow(
