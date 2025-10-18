@@ -8,8 +8,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
 import dev.mos.prom.navigation.MosPromBottomBar
 import dev.mos.prom.navigation.MosPromTopBar
@@ -36,10 +39,10 @@ fun ProfileScreen (
     when (state.status) {
 
         MosPromResult.Error -> {
-            MosPromErrorMessage(
+                MosPromErrorMessage(
                 modifier = Modifier
                     .padding(innerPadding),
-                text = "Ошибка загрузки",
+                    text = state.error ?: "Ошибка загрузки",
                 onUpdate = {
                     viewModel.onEvent(ProfileEvent.OnLoadData)
                 }
@@ -67,13 +70,30 @@ fun ProfileScreen (
                     .fillMaxSize(),
                 containerColor = MaterialTheme.colorScheme.onSurface,
             ) { padding ->
+                var name by remember(state.userModel.name) { mutableStateOf(state.userModel.name) }
+                var description by remember(state.userModel.description) { mutableStateOf(state.userModel.description) }
+                var university by remember(state.userModel.university) { mutableStateOf(state.userModel.university) }
 
                 ProfileView(
                     modifier = Modifier
                         .padding(padding),
                     state = state,
                     innerPadding = innerPadding,
+                    onUploadAvatar = { filename, bytes, mime ->
+                        viewModel.onEvent(ProfileEvent.OnUploadAvatar(filename, bytes, mime))
+                    }
                 )
+                // Minimal inline edit actions (could be a FAB/dialog in real app)
+                /* Example of update trigger:
+                Button(onClick = {
+                    viewModel.onEvent(ProfileEvent.OnUpdateProfile(
+                        name = name,
+                        telegram = null,
+                        description = description,
+                        university = university
+                    ))
+                }) { Text("Сохранить") }
+                */
             }
         }
     }

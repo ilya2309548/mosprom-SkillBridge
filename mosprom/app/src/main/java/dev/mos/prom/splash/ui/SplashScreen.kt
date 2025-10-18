@@ -43,7 +43,8 @@ fun SplashScreen (
         }
         MosPromResult.Success -> {
             LaunchedEffect(Unit) {
-                navController.navigate(Route.Profile) {
+                val dest = if (state.hasToken) Route.Profile else Route.Login
+                navController.navigate(dest) {
                     popUpTo(Route.Splash) {
                         inclusive = true
                     }

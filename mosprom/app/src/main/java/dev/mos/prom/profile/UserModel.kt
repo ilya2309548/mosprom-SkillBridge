@@ -6,4 +6,8 @@ import kotlinx.serialization.Serializable
 data class UserModel (
     val name: String,
     val tg: String,
+    val description: String = "",
+    val university: String = "",
+    val achievements: List<String> = emptyList(),
+    val photoUrl: String? = null,
 )
