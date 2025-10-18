@@ -1,36 +1,51 @@
 package dev.mos.prom.splash
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import dev.mos.prom.navigation.Route
+import dev.mos.prom.ui.text.MosPromErrorMessage
+import dev.mos.prom.utils.MosPromResult
 
 @Composable
 fun SplashScreen (
-    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel : SplashViewModel,
     innerPadding: PaddingValues,
 ) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("splash.json"))
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = LottieConstants.IterateForever,
-    )
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onSurfaceVariant)
-    ) {
-        LottieAnimation(
-            composition = composition,
-            progress = {
-                progress
-            },
-            modifier = Modifier
-                .fillMaxSize()
-        )
+    LaunchedEffect(Unit) {
+        viewModel.onEvent(SplashEvent.OnLoadData)
+    }
+
+    when (state.status) {
+        MosPromResult.Error -> {
+            MosPromErrorMessage(
+                text = "Не удалось загрузить данные",
+                onUpdate = {
+                    viewModel.onEvent(SplashEvent.OnLoadData)
+                },
+                modifier = Modifier,
+            )
+        }
+        MosPromResult.Loading -> {
+            SplashView(
+                innerPadding = innerPadding
+            )
+        }
+        MosPromResult.Success -> {
+            LaunchedEffect(Unit) {
+                navController.navigate(Route.Profile) {
+                    popUpTo(Route.Splash) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
     }
 }

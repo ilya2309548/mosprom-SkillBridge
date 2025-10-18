@@ -1,16 +1,18 @@
-package dev.mos.prom.navigation
+package dev.mos.prom
 
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.mos.prom.navigation.Route
+import dev.mos.prom.profile.ProfileScreen
+import dev.mos.prom.splash.SplashScreen
+import dev.mos.prom.splash.SplashViewModel
 import dev.mos.prom.ui.theme.MospromTheme
 
 @Composable
@@ -32,7 +34,18 @@ fun MosPromApp() {
                 ) {
                     SplashScreen(
                         navController = navController,
-                        viewModel = viewModel(factory = splashComponent.viewModelFactory()),
+                        viewModel = SplashViewModel(),
+                        innerPadding = innerPadding,
+                    )
+                }
+
+                composable<Route.Profile>(
+                    exitTransition = { slideOutHorizontally() },
+                    popEnterTransition = { slideInHorizontally() }
+                ) {
+                    ProfileScreen(
+                        innerPadding = innerPadding,
+                        navController = navController,
                     )
                 }
 

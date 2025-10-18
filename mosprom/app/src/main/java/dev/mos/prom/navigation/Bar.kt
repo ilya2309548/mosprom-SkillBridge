@@ -1,8 +1,7 @@
-package dev.lkey.common.navigation
+package dev.mos.prom.navigation
 
 import androidx.annotation.DrawableRes
 import dev.mos.prom.R
-import dev.mos.prom.navigation.Route
 
 /**
  Все табы приложения
