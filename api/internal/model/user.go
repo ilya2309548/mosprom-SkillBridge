@@ -17,6 +17,9 @@ type User struct {
 	University   string         `json:"university"`
 	Technologies []Technology   `json:"technologies" gorm:"many2many:user_technologies;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Directions   []Direction    `json:"directions" gorm:"many2many:user_directions;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	// Subscriptions
+	Clubs      []Club `json:"clubs" gorm:"many2many:club_subscribers;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ClubsCount int    `json:"clubs_count"`
 }
 
 type Technology struct {

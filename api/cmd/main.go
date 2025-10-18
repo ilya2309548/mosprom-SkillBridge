@@ -83,6 +83,8 @@ func main() {
 	// Clubs
 	r.GET("/clubs", handler.ListClubs)
 	r.GET("/clubs/:name", handler.GetClubByName)
+	// Subscribers of a club (avoid conflict with /clubs/:name)
+	r.GET("/clubs/id/:id/subscribers", handler.GetClubSubscribers)
 
 	// Directions
 	r.GET("/directions", handler.ListDirections)
@@ -92,6 +94,7 @@ func main() {
 	{
 		clubAuth.POST("", handler.CreateClub)
 		clubAuth.POST(":id/logo", handler.SetClubLogo)
+		clubAuth.POST("id/:id/subscribe", handler.SubscribeToClub)
 	}
 
 	// Secured profile routes
@@ -102,7 +105,12 @@ func main() {
 		auth.PUT("/me", handler.UpdateMe)
 		auth.PATCH("/me", handler.UpdateMe)
 		auth.POST("/me/photo", handler.SetMyPhoto)
+		// Current user's subscribed clubs
+		auth.GET("/me/clubs", handler.GetUserClubs)
 	}
+
+	// Get clubs of a specific user by id
+	r.GET("/users/:id/clubs", handler.GetSubscriberClubs)
 
 	log.Println("start at :8080")
 	if err := r.Run(":8080"); err != nil {

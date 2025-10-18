@@ -144,6 +144,101 @@ func ListClubs(c *gin.Context) {
 	c.JSON(http.StatusOK, clubs)
 }
 
+// SubscribeToClub godoc
+// @Summary Subscribe current user to a club
+// @Tags clubs
+// @Security BearerAuth
+// @Param id path int true "Club ID"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /clubs/id/{id}/subscribe [post]
+func SubscribeToClub(c *gin.Context) {
+	uidAny, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	uid := uidAny.(uint)
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	if err := clubService.Subscribe(uid, uint(id64)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
+// GetClubSubscribers godoc
+// @Summary List subscribers of a club
+// @Tags clubs
+// @Produce json
+// @Param id path int true "Club ID"
+// @Success 200 {array} model.User
+// @Failure 400 {object} map[string]string
+// @Router /clubs/id/{id}/subscribers [get]
+func GetClubSubscribers(c *gin.Context) {
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	users, err := clubService.Subscribers(uint(id64))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}
+
+// GetUserClubs godoc
+// @Summary List clubs the current user is subscribed to
+// @Tags profile
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {array} model.Club
+// @Failure 401 {object} map[string]string
+// @Router /me/clubs [get]
+func GetUserClubs(c *gin.Context) {
+	uidAny, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	uid := uidAny.(uint)
+	clubs, err := clubService.ClubsOfUser(uid)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, clubs)
+}
+
+// GetSubscriberClubs godoc
+// @Summary List clubs a user is subscribed to
+// @Tags users
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {array} model.Club
+// @Failure 400 {object} map[string]string
+// @Router /users/{id}/clubs [get]
+func GetSubscriberClubs(c *gin.Context) {
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	clubs, err := clubService.ClubsOfUser(uint(id64))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, clubs)
+}
+
 func init() {
 	_ = middleware.JWTAuth // keep import if unused by compiler
 	var _ model.Club       // reference for swagger type import

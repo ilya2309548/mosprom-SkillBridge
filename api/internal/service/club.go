@@ -56,3 +56,15 @@ func (s *ClubService) SetLogo(clubID uint, filename string) error {
 func (s *ClubService) ListFiltered(name *string, directions []string) ([]model.Club, error) {
 	return repository.ListClubsFiltered(name, directions)
 }
+
+func (s *ClubService) Subscribe(userID, clubID uint) error {
+	return repository.SubscribeUserToClub(userID, clubID)
+}
+
+func (s *ClubService) Subscribers(clubID uint) ([]model.User, error) {
+	return repository.GetClubSubscribers(clubID)
+}
+
+func (s *ClubService) ClubsOfUser(userID uint) ([]model.Club, error) {
+	return repository.GetUserClubs(userID)
+}
