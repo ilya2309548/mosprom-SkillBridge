@@ -9,14 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import dev.mos.prom.navigation.Route
-import dev.mos.prom.auth.ui.LoginScreen
-import dev.mos.prom.auth.ui.RegisterScreen
-import dev.mos.prom.profile.ui.ProfileScreen
-import dev.mos.prom.profile.viewmodel.ProfileViewModel
-import dev.mos.prom.splash.ui.SplashScreen
-import dev.mos.prom.splash.viewmodel.SplashViewModel
-import dev.mos.prom.ui.theme.MospromTheme
+import dev.mos.prom.utils.navigation.Route
+import dev.mos.prom.presentation.auth.ui.LoginScreen
+import dev.mos.prom.presentation.auth.ui.RegisterScreen
+import dev.mos.prom.presentation.profile.ui.ProfileScreen
+import dev.mos.prom.presentation.profile.ui.EditProfileScreen
+import dev.mos.prom.presentation.splash.ui.SplashScreen
+import dev.mos.prom.presentation.ui.theme.MospromTheme
 
 @Composable
 fun MosPromApp() {
@@ -60,6 +59,16 @@ fun MosPromApp() {
                     popEnterTransition = { slideInHorizontally() }
                 ) {
                     ProfileScreen(
+                        innerPadding = innerPadding,
+                        navController = navController,
+                    )
+                }
+
+                composable<Route.EditProfile>(
+                    exitTransition = { slideOutHorizontally() },
+                    popEnterTransition = { slideInHorizontally() }
+                ) {
+                    EditProfileScreen(
                         innerPadding = innerPadding,
                         navController = navController,
                     )

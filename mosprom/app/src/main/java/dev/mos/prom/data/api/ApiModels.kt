@@ -1,0 +1,51 @@
+package dev.mos.prom.data.api
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class LoginRequest(
+    @SerialName("telegram_name") val telegramName: String,
+    val password: String,
+)
+
+@Serializable
+data class LoginResponse(
+    val token: String,
+)
+
+@Serializable
+data class RegisterRequest(
+    @SerialName("telegram_name") val telegramName: String,
+    val name: String? = null,
+    val password: String,
+    val description: String? = null,
+    val university: String? = null,
+    val achievements: List<String> = emptyList(),
+)
+
+@Serializable
+data class UserDto(
+    val id: Long,
+    @SerialName("telegram_name") val telegramName: String,
+    val name: String? = null,
+    val description: String? = null,
+    val photo: String? = null,
+    @SerialName("achievements") val achievements: List<String> = emptyList(),
+    @SerialName("events_count") val eventsCount: Int = 0,
+    val university: String? = null,
+    val technologies: List<TechnologyDto> = emptyList(),
+    val directions: List<DirectionDto> = emptyList(),
+)
+
+@Serializable
+data class TechnologyDto(
+    val id: Long? = null,
+    val name: String
+)
+
+@Serializable
+data class DirectionDto(
+    val id: Long? = null,
+    val name: String
+)
