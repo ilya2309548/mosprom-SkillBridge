@@ -15,8 +15,8 @@ import (
 var userServiceAuth = service.NewUserService()
 
 type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	TelegramName string `json:"telegram_name" binding:"required"`
+	Password     string `json:"password" binding:"required"`
 }
 
 type LoginResponse struct {
@@ -29,7 +29,7 @@ type LoginResponse struct {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param input body LoginRequest true "Login credentials (email & password)"
+// @Param input body LoginRequest true "Login credentials (telegram_name & password)"
 // @Success 200 {object} LoginResponse
 // @Failure 400 {object} map[string]string "Invalid input"
 // @Failure 401 {object} map[string]string "Unauthorized"
@@ -41,10 +41,10 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Printf("login attempt email=%s", req.Email)
-	user, err := userServiceAuth.AuthenticateUser(req.Email, req.Password)
+	log.Printf("login attempt tg=%s", req.TelegramName)
+	user, err := userServiceAuth.AuthenticateByTelegram(req.TelegramName, req.Password)
 	if err != nil {
-		log.Printf("login failed email=%s: %v", req.Email, err)
+		log.Printf("login failed tg=%s: %v", req.TelegramName, err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
@@ -56,9 +56,8 @@ func Login(c *gin.Context) {
 
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
-		"name":    user.Name, // This line remains unchanged as it is still needed for the claims
-		"email":   user.Email,
-		"role":    user.Role,
+		"name":    user.Name,
+		"tg":      user.TelegramName,
 		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	}
 

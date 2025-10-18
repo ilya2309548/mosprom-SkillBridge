@@ -3,22 +3,98 @@ package repository
 import (
 	"2gis-calm-map/api/internal/db"
 	"2gis-calm-map/api/internal/model"
+	"errors"
+
+	"gorm.io/gorm"
 )
 
 func GetAllUsers() ([]model.User, error) {
 	var users []model.User
-	err := db.DB.Find(&users).Error
+	err := db.DB.Preload("Technologies").Preload("Directions").Find(&users).Error
 	return users, err
 }
 
-func CreateUser(name, email, password, role string) (model.User, error) {
-	user := model.User{Name: name, Email: email, Password: password, Role: role}
-	err := db.DB.Create(&user).Error
+func CreateUser(user *model.User) error {
+	return db.DB.Create(user).Error
+}
+
+func GetUserByID(id uint) (model.User, error) {
+	var user model.User
+	err := db.DB.Preload("Technologies").Preload("Directions").First(&user, id).Error
 	return user, err
 }
 
-func GetUserByEmail(email string) (model.User, error) {
+func UpdateUser(user *model.User) error {
+	// Save handles both update of fields and M2M associations when set
+	return db.DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(user).Error
+}
+
+func DeleteUser(id uint) error {
+	return db.DB.Delete(&model.User{}, id).Error
+}
+
+func FindOrCreateTechnologiesByNames(names []string) ([]model.Technology, error) {
+	if len(names) == 0 {
+		return nil, nil
+	}
+	var techs []model.Technology
+	for _, n := range names {
+		if n == "" {
+			continue
+		}
+		var t model.Technology
+		if err := db.DB.Where("name = ?", n).First(&t).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				t = model.Technology{Name: n}
+				if err := db.DB.Create(&t).Error; err != nil {
+					return nil, err
+				}
+			} else {
+				return nil, err
+			}
+		}
+		techs = append(techs, t)
+	}
+	return techs, nil
+}
+
+func FindOrCreateDirectionsByNames(names []string) ([]model.Direction, error) {
+	if len(names) == 0 {
+		return nil, nil
+	}
+	var dirs []model.Direction
+	for _, n := range names {
+		if n == "" {
+			continue
+		}
+		var d model.Direction
+		if err := db.DB.Where("name = ?", n).First(&d).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				d = model.Direction{Name: n}
+				if err := db.DB.Create(&d).Error; err != nil {
+					return nil, err
+				}
+			} else {
+				return nil, err
+			}
+		}
+		dirs = append(dirs, d)
+	}
+	return dirs, nil
+}
+
+func ReplaceUserAssociations(user *model.User, technologies []model.Technology, directions []model.Direction) error {
+	if err := db.DB.Model(user).Association("Technologies").Replace(&technologies); err != nil {
+		return err
+	}
+	if err := db.DB.Model(user).Association("Directions").Replace(&directions); err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetUserByTelegram(tg string) (model.User, error) {
 	var user model.User
-	err := db.DB.Where("email = ?", email).First(&user).Error
+	err := db.DB.Where("telegram_name = ?", tg).First(&user).Error
 	return user, err
 }

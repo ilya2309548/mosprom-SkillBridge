@@ -21,7 +21,7 @@ func Init(cfg *config.Config) {
 	log.Println("Database connected")
 
 	// MIGRATION: автоматически создаёт таблицы, если их нет
-	if err := DB.AutoMigrate(&model.User{}); err != nil {
+	if err := DB.AutoMigrate(&model.Technology{}, &model.Direction{}, &model.User{}); err != nil {
 		log.Fatal("failed to migrate database: ", err)
 	}
 

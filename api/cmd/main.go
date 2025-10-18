@@ -14,6 +14,7 @@ import (
 
 	"2gis-calm-map/api/internal/db"
 	"2gis-calm-map/api/internal/handler"
+	"2gis-calm-map/api/internal/middleware"
 )
 
 // @title 2gis-calm-map API
@@ -29,6 +30,9 @@ func main() {
 	db.Init(cfg)
 
 	r := gin.Default()
+
+	// serve uploaded files
+	r.Static("/uploads", "uploads")
 
 	// Simple CORS (allow all) – adjust for production.
 	r.Use(func(c *gin.Context) {
@@ -61,9 +65,30 @@ func main() {
 		ginSwagger.WrapHandler(swaggerFiles.Handler)(c)
 	})
 
+	// Auth routes (kept but not focus of current task)
 	r.POST("/register", handler.Register)
 	r.POST("/login", handler.Login)
+
+	// Users CRUD
 	r.GET("/users", handler.GetUsers)
+	r.POST("/users", handler.CreateUser)
+	r.GET("/users/:id", handler.GetUserByID)
+	r.PUT("/users/:id", handler.UpdateUser)
+	r.PATCH("/users/:id", handler.UpdateUser)
+	r.DELETE("/users/:id", handler.DeleteUser)
+
+	// Public photos access by filename
+	r.GET("/photos/:filename", handler.GetPhotoByName)
+
+	// Secured profile routes
+	auth := r.Group("/")
+	auth.Use(middleware.JWTAuth())
+	{
+		auth.GET("/me", handler.GetMe)
+		auth.PUT("/me", handler.UpdateMe)
+		auth.PATCH("/me", handler.UpdateMe)
+		auth.POST("/me/photo", handler.SetMyPhoto)
+	}
 
 	log.Println("start at :8080")
 	if err := r.Run(":8080"); err != nil {

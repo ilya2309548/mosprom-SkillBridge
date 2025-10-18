@@ -29,6 +29,9 @@
 /docs/*.json
 /docs/*.yaml
 
+# Uploaded files
+/uploads/
+
 # Env files
 .env
 

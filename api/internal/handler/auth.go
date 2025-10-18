@@ -13,10 +13,12 @@ import (
 
 // RegisterRequest — тело запроса для регистрации пользователя
 type RegisterRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-	Role     string `json:"role" binding:"required"`
+	TelegramName string   `json:"telegram_name" binding:"required"`
+	Name         string   `json:"name"`
+	Password     string   `json:"password" binding:"required"`
+	Description  string   `json:"description"`
+	University   string   `json:"university"`
+	Achievements []string `json:"achievements"`
 }
 
 type RegisterResponse struct {
@@ -45,7 +47,14 @@ func Register(c *gin.Context) {
 	}
 
 	// В реальном проекте: password = hash(req.Password)
-	user, err := userServiceReg.CreateUser(req.Name, req.Email, req.Password, req.Role)
+	user, err := userServiceReg.CreateUser(service.CreateUserInput{
+		TelegramName: req.TelegramName,
+		Name:         req.Name,
+		Password:     req.Password,
+		Description:  req.Description,
+		University:   req.University,
+		Achievements: req.Achievements,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -59,8 +68,7 @@ func Register(c *gin.Context) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
 		"name":    user.Name,
-		"email":   user.Email,
-		"role":    user.Role,
+		"tg":      user.TelegramName,
 		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	}
 

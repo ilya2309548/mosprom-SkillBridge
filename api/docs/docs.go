@@ -30,7 +30,7 @@ const docTemplate = `{
                 "summary": "User login",
                 "parameters": [
                     {
-                        "description": "Login credentials (email \u0026 password)",
+                        "description": "Login credentials (telegram_name \u0026 password)",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -66,6 +66,177 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns current authorized user profile",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Get current user profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update current authorized user profile, accepts JSON or multipart/form-data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Update current user profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/me/photo": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Upload and set user photo (multipart/form-data)",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Set current user photo",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "User photo",
+                        "name": "photo",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/photos/{filename}": {
+            "get": {
+                "description": "Returns a photo from uploads/photos by filename (DB stores just filenames)",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "photos"
+                ],
+                "summary": "Get photo by filename",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Photo file name",
+                        "name": "filename",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -155,14 +326,14 @@ const docTemplate = `{
         "handler.LoginRequest": {
             "type": "object",
             "required": [
-                "email",
-                "password"
+                "password",
+                "telegram_name"
             ],
             "properties": {
-                "email": {
+                "password": {
                     "type": "string"
                 },
-                "password": {
+                "telegram_name": {
                     "type": "string"
                 }
             }
@@ -178,13 +349,17 @@ const docTemplate = `{
         "handler.RegisterRequest": {
             "type": "object",
             "required": [
-                "email",
-                "name",
                 "password",
-                "role"
+                "telegram_name"
             ],
             "properties": {
-                "email": {
+                "achievements": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "description": {
                     "type": "string"
                 },
                 "name": {
@@ -193,7 +368,10 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "role": {
+                "telegram_name": {
+                    "type": "string"
+                },
+                "university": {
                     "type": "string"
                 }
             }
@@ -209,11 +387,48 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Direction": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Technology": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "properties": {
-                "email": {
+                "achievements": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "description": {
                     "type": "string"
+                },
+                "directions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Direction"
+                    }
+                },
+                "events_count": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -221,8 +436,20 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "role": {
-                    "description": "например, \"user\", \"admin\"",
+                "photo": {
+                    "description": "относительный путь до файла",
+                    "type": "string"
+                },
+                "technologies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Technology"
+                    }
+                },
+                "telegram_name": {
+                    "type": "string"
+                },
+                "university": {
                     "type": "string"
                 }
             }
