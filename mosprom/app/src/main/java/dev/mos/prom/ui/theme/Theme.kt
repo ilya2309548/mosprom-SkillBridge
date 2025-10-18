@@ -8,34 +8,35 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import dev.mos.prom.utils.ThemeMode
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = Color(0xFF537E70),
+    surface = Color(0xFFF3EDF7),
+    onSurfaceVariant = Color(0xFFEFFAFF),
+    onSurface = Color(0xFFFEF7FF),
+    inverseOnSurface = Color(0xFF1D1B20),
+    outline = Color(0xFFD3FAE6),
+    surfaceTint = Color(0xFF29E881),
+    surfaceContainer = Color(0xFF49454F),
+    surfaceContainerLow = Color(0xFFD4FAE6),
+    surfaceDim = Color(0xFFCAC4D0),
+    primaryContainer = Color(0xFFECE6F0),
+    inverseSurface = Color(0xFF3D3D3D),
+    secondaryContainer = Color(0xFF7C7681),
+    onSecondary = Color(0xFFE9E5EC),
+    tertiaryContainer = Color(0xFF1D1B20),
 )
+
+
 
 @Composable
 fun MospromTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -44,7 +45,7 @@ fun MospromTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme
         else -> LightColorScheme
     }
 

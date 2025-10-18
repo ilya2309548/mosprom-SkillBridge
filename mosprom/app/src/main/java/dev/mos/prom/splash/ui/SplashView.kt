@@ -29,7 +29,7 @@ fun SplashView(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onSurfaceVariant)
+            .background(MaterialTheme.colorScheme.primary)
             .padding(innerPadding)
     ) {
         LottieAnimation(

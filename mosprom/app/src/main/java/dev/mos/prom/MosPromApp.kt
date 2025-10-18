@@ -10,7 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.mos.prom.navigation.Route
-import dev.mos.prom.profile.ProfileScreen
+import dev.mos.prom.profile.ui.ProfileScreen
+import dev.mos.prom.profile.viewmodel.ProfileViewModel
 import dev.mos.prom.splash.ui.SplashScreen
 import dev.mos.prom.splash.viewmodel.SplashViewModel
 import dev.mos.prom.ui.theme.MospromTheme
@@ -46,6 +47,7 @@ fun MosPromApp() {
                     ProfileScreen(
                         innerPadding = innerPadding,
                         navController = navController,
+                        viewModel = ProfileViewModel(),
                     )
                 }
 
