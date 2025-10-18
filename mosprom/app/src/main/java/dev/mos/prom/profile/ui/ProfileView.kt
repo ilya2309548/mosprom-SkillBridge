@@ -1,6 +1,7 @@
 package dev.mos.prom.profile.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -21,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,49 +30,89 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import dev.mos.prom.R
 import dev.mos.prom.profile.ui.components.AchievementChip
 import dev.mos.prom.profile.ui.components.SectionHeader
 import dev.mos.prom.profile.viewmodel.ProfileState
+import dev.mos.prom.profile.viewmodel.ProfileEvent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toFile
+import java.io.InputStream
 
 @Composable
 fun ProfileView(
     modifier: Modifier = Modifier,
     state: ProfileState,
     innerPadding: PaddingValues,
+    onUploadAvatar: (filename: String, bytes: ByteArray, mime: String) -> Unit = { _, _, _ -> },
 ) {
+    val context = LocalContext.current
+    var pickedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
+    val pickLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            val bytes = context.contentResolver.openInputStream(uri)?.use(InputStream::readBytes)
+            pickedImageBytes = bytes
+            if (bytes != null) {
+                val mime = context.contentResolver.getType(uri) ?: "image/jpeg"
+                val name = uri.lastPathSegment?.substringAfterLast('/') ?: "avatar.jpg"
+                onUploadAvatar(name, bytes, mime)
+            }
+        }
+    }
     Column(
-        modifier = Modifier
+        modifier = modifier
+            .background(Color.White)
             .padding(innerPadding)
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(Modifier.height(12.dp))
-
         // Аватар и имя
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(R.drawable.ic_avatar_placeholder),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(8.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (state.userModel.photoUrl != null) {
+                AsyncImage(
+                    model = state.userModel.photoUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .clickable { pickLauncher.launch("image/*") }
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_avatar_placeholder),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(8.dp)
+                        .clickable { pickLauncher.launch("image/*") },
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
             Spacer(Modifier.width(12.dp))
+
             Column {
                 Text(
-                    text = "Венедиктов Павел",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    text = state.userModel.name,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, color = Color.Black)
                 )
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("3 проекта", style = MaterialTheme.typography.bodySmall)
-                    Text("12 событий", style = MaterialTheme.typography.bodySmall)
-                    Text("102 клуба", style = MaterialTheme.typography.bodySmall)
+                    Text("3 проекта", style = MaterialTheme.typography.bodySmall, color = Color.Black)
+                    Text("12 событий", style = MaterialTheme.typography.bodySmall, color = Color.Black)
+                    Text("102 клуба", style = MaterialTheme.typography.bodySmall, color = Color.Black)
                 }
             }
         }
@@ -79,35 +121,28 @@ fun ProfileView(
 
         // Блоки
         SectionHeader("О себе")
-        Text(
-            "Активно участвую в развитии классических машиностроительных производств.",
-            style = MaterialTheme.typography.bodyMedium
-        )
+    Text(state.userModel.description.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
 
         SectionHeader("Работа")
-        Text("Инженер-исследователь,", fontWeight = FontWeight.Bold)
-        Text("Современные Технологии Газовых Турбин")
+    Text(state.userModel.university.ifBlank { "—" }, fontWeight = FontWeight.Bold, color = Color.Black)
 
         SectionHeader("Образование")
-        Text("МТИ  •  бакалавриат", fontWeight = FontWeight.Bold)
-        Text("Технологические машины и оборудование в промышленности")
+    Text("—", color = Color.Black)
 
         SectionHeader("Направления")
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            listOf(
-                "Конструкторско-технологическое обеспечение",
-                "Документация",
-                "Роботизация производства",
-                "ЧПУ",
-                "Авиационная техника",
-                "Развернуть..."
-            ).forEach {
+            state.userModel.achievements.ifEmpty { listOf("—") }.forEach {
                 AssistChip(
                     onClick = { },
-                    label = { Text(it) }
+                    label = {
+                        Text(
+                            text = it,
+                            color = Color.Black
+                        )
+                    }
                 )
             }
         }
@@ -117,17 +152,16 @@ fun ProfileView(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            AchievementChip("Хакатон от МАИ", Color(0xFF964B00))
-            AchievementChip("Лекция от МТИ", Color(0xFFB8860B))
-            AchievementChip("Воркшоп от МЭИ", Color(0xFF4169E1))
-            AchievementChip("Кейс от МАИ", Color(0xFF4B8B3B))
+            state.userModel.achievements.take(4).forEachIndexed { idx, a ->
+                AchievementChip(a, Color(0xFF964B00 + (idx * 1000)))
+            }
         }
 
         SectionHeader("Проекты")
-        Text("Ускоритель заряженных частиц", fontWeight = FontWeight.Bold)
+    Text("—", fontWeight = FontWeight.Bold, color = Color.Black)
 
         TextButton(onClick = { /* читать подробнее */ }) {
-            Text("Читать")
+            Text("Читать", color = Color.Black)
         }
     }
 }

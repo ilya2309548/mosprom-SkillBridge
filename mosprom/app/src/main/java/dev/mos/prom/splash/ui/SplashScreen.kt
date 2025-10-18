@@ -12,11 +12,12 @@ import dev.mos.prom.splash.viewmodel.SplashEvent
 import dev.mos.prom.splash.viewmodel.SplashViewModel
 import dev.mos.prom.ui.text.MosPromErrorMessage
 import dev.mos.prom.utils.MosPromResult
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SplashScreen (
     navController: NavController,
-    viewModel : SplashViewModel,
+    viewModel : SplashViewModel = koinViewModel<SplashViewModel>(),
     innerPadding: PaddingValues,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -42,7 +43,8 @@ fun SplashScreen (
         }
         MosPromResult.Success -> {
             LaunchedEffect(Unit) {
-                navController.navigate(Route.Profile) {
+                val dest = if (state.hasToken) Route.Profile else Route.Login
+                navController.navigate(dest) {
                     popUpTo(Route.Splash) {
                         inclusive = true
                     }

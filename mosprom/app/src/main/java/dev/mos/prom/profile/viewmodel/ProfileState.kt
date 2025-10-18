@@ -8,5 +8,6 @@ data class ProfileState (
         name = "Кирюшин Алексей Александрович",
         tg = "@lkey"
     ),
-    val status: MosPromResult = MosPromResult.Loading
+    val status: MosPromResult = MosPromResult.Loading,
+    val error: String? = null,
 )

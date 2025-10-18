@@ -16,7 +16,7 @@ fun SectionHeader(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.labelLarge.copy(
-            color = androidx.compose.ui.graphics.Color.Gray,
+            color = androidx.compose.ui.graphics.Color.Black,
             fontWeight = FontWeight.SemiBold
         )
     )

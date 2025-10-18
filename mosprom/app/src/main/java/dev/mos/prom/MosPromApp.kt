@@ -10,6 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.mos.prom.navigation.Route
+import dev.mos.prom.auth.ui.LoginScreen
+import dev.mos.prom.auth.ui.RegisterScreen
 import dev.mos.prom.profile.ui.ProfileScreen
 import dev.mos.prom.profile.viewmodel.ProfileViewModel
 import dev.mos.prom.splash.ui.SplashScreen
@@ -35,7 +37,20 @@ fun MosPromApp() {
                 ) {
                     SplashScreen(
                         navController = navController,
-                        viewModel = SplashViewModel(),
+                        innerPadding = innerPadding,
+                    )
+                }
+
+                composable<Route.Login> {
+                    LoginScreen(
+                        navController = navController,
+                        innerPadding = innerPadding,
+                    )
+                }
+
+                composable<Route.Register> {
+                    RegisterScreen(
+                        navController = navController,
                         innerPadding = innerPadding,
                     )
                 }
@@ -47,7 +62,6 @@ fun MosPromApp() {
                     ProfileScreen(
                         innerPadding = innerPadding,
                         navController = navController,
-                        viewModel = ProfileViewModel(),
                     )
                 }
 
