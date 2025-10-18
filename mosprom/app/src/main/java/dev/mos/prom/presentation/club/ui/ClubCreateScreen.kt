@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -48,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import dev.mos.prom.R
+import dev.mos.prom.presentation.ui.util.placeholderPainter
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateEvent
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateViewModel
 import dev.mos.prom.presentation.ui.components.MosTextField
@@ -80,7 +82,16 @@ fun ClubCreateScreen(
                 }
             }
             Scaffold(
-                topBar = { MosPromTopBar(title = "Новый клуб") },
+                topBar = {
+                    MosPromTopBar(
+                        title = "Новый клуб",
+                        navIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(painter = painterResource(R.drawable.ic_back), contentDescription = "Назад")
+                            }
+                        }
+                    )
+                },
                 containerColor = MaterialTheme.colorScheme.onSurface
             ) { padding ->
                 val ctx = androidx.compose.ui.platform.LocalContext.current
@@ -122,7 +133,11 @@ fun ClubCreateScreen(
                                     )
                                 }
                             } else {
-                                Icon(painter = painterResource(R.drawable.ic_avatar_placeholder), contentDescription = null)
+                                    androidx.compose.foundation.Image(
+                                        painter = placeholderPainter(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
                             }
                         }
                         Spacer(Modifier.width(12.dp))
@@ -171,16 +186,12 @@ fun ClubCreateScreen(
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .padding(12.dp)
                                 ) {
-//                                    Box(
-//                                        modifier = Modifier
-//                                            .size(40.dp)
-//                                            .clip(CircleShape)
-//                                            .background(MaterialTheme.colorScheme.primary)
-//                                    ) {}
 
                                     AsyncImage(
                                         model = c.logoUrl,
                                         contentDescription = null,
+                                        placeholder = placeholderPainter(),
+                                        error = placeholderPainter(),
                                         modifier = Modifier
                                             .clip(CircleShape)
                                             .size(44.dp)

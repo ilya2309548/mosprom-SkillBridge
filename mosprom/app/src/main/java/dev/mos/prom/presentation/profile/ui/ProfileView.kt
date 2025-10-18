@@ -38,6 +38,7 @@ import dev.mos.prom.presentation.ui.text.AchievementChip
 import dev.mos.prom.presentation.ui.text.SectionHeader
 import dev.mos.prom.presentation.profile.viewmodel.ProfileState
 import java.io.InputStream
+import dev.mos.prom.presentation.ui.util.placeholderPainter
 
 @Composable
 fun ProfileView(
@@ -73,6 +74,8 @@ fun ProfileView(
                 AsyncImage(
                     model = state.userModel.photoUrl,
                     contentDescription = null,
+                    placeholder = placeholderPainter(),
+                    error = placeholderPainter(),
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
@@ -80,16 +83,14 @@ fun ProfileView(
                         .clickable { pickLauncher.launch("image/*") }
                 )
             } else {
-                Icon(
-                    painter = painterResource(R.drawable.ic_avatar_placeholder),
+                androidx.compose.foundation.Image(
+                    painter = placeholderPainter(),
                     contentDescription = null,
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(8.dp)
-                        .clickable { pickLauncher.launch("image/*") },
-                    tint = MaterialTheme.colorScheme.primary
+                        .clickable { pickLauncher.launch("image/*") }
                 )
             }
 
