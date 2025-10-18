@@ -15,6 +15,7 @@ import (
 )
 
 var userService = service.NewUserService()
+var directionService = service.NewDirectionService()
 
 // GetUsers godoc
 // @Summary Get users
@@ -503,4 +504,19 @@ func GetPhotoByName(c *gin.Context) {
 		return
 	}
 	c.File(full)
+}
+
+// ListDirections godoc
+// @Summary List all directions
+// @Tags directories
+// @Produce json
+// @Success 200 {array} model.Direction
+// @Router /directions [get]
+func ListDirections(c *gin.Context) {
+	dirs, err := directionService.List()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, dirs)
 }

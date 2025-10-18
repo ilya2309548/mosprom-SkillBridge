@@ -84,6 +84,9 @@ func main() {
 	r.GET("/clubs", handler.ListClubs)
 	r.GET("/clubs/:name", handler.GetClubByName)
 
+	// Directions
+	r.GET("/directions", handler.ListDirections)
+
 	clubAuth := r.Group("/clubs")
 	clubAuth.Use(middleware.JWTAuth())
 	{
