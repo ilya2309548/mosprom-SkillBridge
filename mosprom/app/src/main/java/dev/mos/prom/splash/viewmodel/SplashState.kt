@@ -1,4 +1,4 @@
-package dev.mos.prom.splash
+package dev.mos.prom.splash.viewmodel
 
 import dev.mos.prom.utils.MosPromResult
 

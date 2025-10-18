@@ -1,4 +1,4 @@
-package dev.mos.prom.splash
+package dev.mos.prom.splash.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.mos.prom.navigation.Route
+import dev.mos.prom.splash.viewmodel.SplashEvent
+import dev.mos.prom.splash.viewmodel.SplashViewModel
 import dev.mos.prom.ui.text.MosPromErrorMessage
 import dev.mos.prom.utils.MosPromResult
 

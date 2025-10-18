@@ -11,8 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.mos.prom.navigation.Route
 import dev.mos.prom.profile.ProfileScreen
-import dev.mos.prom.splash.SplashScreen
-import dev.mos.prom.splash.SplashViewModel
+import dev.mos.prom.splash.ui.SplashScreen
+import dev.mos.prom.splash.viewmodel.SplashViewModel
 import dev.mos.prom.ui.theme.MospromTheme
 
 @Composable
