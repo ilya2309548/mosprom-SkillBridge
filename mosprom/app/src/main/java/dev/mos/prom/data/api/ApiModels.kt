@@ -102,3 +102,17 @@ data class PostDto(
     val technologies: List<TechnologyDto> = emptyList(),
     val image: String? = null,
 )
+
+// Achievements
+@Serializable
+data class AddAchievementRequest(
+    @SerialName("user_id") val userId: Long,
+    val achievement: String,
+)
+
+// Join post
+@Serializable
+data class JoinPostRequest(
+    @SerialName("post_id") val postId: Long,
+    @SerialName("user_id") val userId: Long,
+)

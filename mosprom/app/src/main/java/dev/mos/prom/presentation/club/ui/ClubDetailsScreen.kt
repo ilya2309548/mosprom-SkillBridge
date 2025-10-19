@@ -3,6 +3,13 @@ package dev.mos.prom.presentation.club.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,12 +43,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,6 +59,7 @@ import coil.compose.AsyncImage
 import dev.mos.prom.R
 import dev.mos.prom.data.api.PostDto
 import dev.mos.prom.data.api.PostService
+import dev.mos.prom.data.api.UserDto
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsEvent
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsViewModel
 import dev.mos.prom.presentation.ui.text.MosPromLoadingBar
@@ -57,6 +67,7 @@ import dev.mos.prom.utils.navigation.MosPromTopBar
 import dev.mos.prom.utils.navigation.Route
 import dev.mos.prom.utils.placeholderPainter
 import org.koin.compose.koinInject
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -138,10 +149,12 @@ fun ClubDetailsScreen(
 
                     Spacer(Modifier.width(12.dp))
 
-                    Button(
-                        onClick = { navController.navigate(dev.mos.prom.utils.navigation.Route.CreatePost(clubId = id, clubName = clubName)) },
-                    ) {
-                        Text("Добавить пост", style = MaterialTheme.typography.labelLarge)
+                    if (isCreator) {
+                        Button(
+                            onClick = { navController.navigate(dev.mos.prom.utils.navigation.Route.CreatePost(clubId = id, clubName = clubName)) },
+                        ) {
+                            Text("Добавить пост", style = MaterialTheme.typography.labelLarge)
+                        }
                     }
                 }
             }
@@ -295,7 +308,7 @@ fun ClubDetailsScreen(
                     Text("Нет постов", color = Color.Black, style = MaterialTheme.typography.bodyMedium)
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        filtered.forEach { p: PostDto -> PostCard(p) }
+                        filtered.forEach { p: PostDto -> PostCard(p = p, isCreator = isCreator, currentClubId = id) }
                     }
                 }
             }
@@ -304,14 +317,54 @@ fun ClubDetailsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PostCard(p: PostDto) {
+private fun PostCard(p: PostDto, isCreator: Boolean, currentClubId: Long) {
+    // Hoisted state/services so they are available for menu and bottom sheet
+    var menuExpanded by remember { mutableStateOf(false) }
+    var showParticipants by remember { mutableStateOf(false) }
+    var participants by remember { mutableStateOf<List<UserDto>>(emptyList()) }
+    var loading by remember { mutableStateOf(false) }
+    var errorText by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val postService: PostService = koinInject()
+    val profileService: dev.mos.prom.data.api.ProfileService = koinInject()
+    val profileRepo: dev.mos.prom.data.repo.ProfileRepository = koinInject()
+    var joinLoading by remember { mutableStateOf(false) }
+    var joined by remember { mutableStateOf(false) }
     androidx.compose.material3.Card(
         colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(12.dp)) {
-            Text(p.title, color = Color.Black, style = MaterialTheme.typography.titleMedium)
+
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(p.title, color = Color.Black, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                if (isCreator && p.clubId == currentClubId) {
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = "Ещё")
+                    }
+                    DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                        DropdownMenuItem(text = { Text("Участники") }, onClick = {
+                            menuExpanded = false
+                            showParticipants = true
+                            scope.launch {
+                                loading = true
+                                errorText = null
+                                try {
+                                    participants = postService.getParticipants(p.id)
+                                } catch (t: Throwable) {
+                                    errorText = t.message
+                                    participants = emptyList()
+                                } finally {
+                                    loading = false
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+            
             if (!p.description.isNullOrBlank()) {
                 Spacer(Modifier.height(4.dp))
                 Text(p.description!!, color = Color.Black, style = MaterialTheme.typography.bodyMedium)
@@ -366,6 +419,106 @@ private fun PostCard(p: PostDto) {
                 Spacer(Modifier.height(8.dp))
                 Text("Адрес: $it", color = Color.Black, style = MaterialTheme.typography.bodySmall)
             }
+
+            // Join button for non-owners
+            if (!isCreator && p.clubId == currentClubId && !joined) {
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = {
+                    scope.launch {
+                        try {
+                            joinLoading = true
+                            val myId = profileRepo.myId()
+                            postService.joinPost(postId = p.id, userId = myId)
+                            joined = true
+                        } catch (t: Throwable) {
+                            errorText = t.message
+                        } finally {
+                            joinLoading = false
+                        }
+                    }
+                }, enabled = !joinLoading) {
+                    Text(if (joinLoading) "Присоединяем..." else "Присоединиться")
+                }
+            }
         }
+    }
+
+    // Participants bottom sheet and achievement dialog
+    var selectedUser by remember { mutableStateOf<dev.mos.prom.data.api.UserDto?>(null) }
+    var achText by remember { mutableStateOf("") }
+
+    if (showParticipants && isCreator && p.clubId == currentClubId) {
+        ModalBottomSheet(onDismissRequest = { showParticipants = false }) {
+            Column(Modifier.padding(16.dp)) {
+                Text("Участники", color = Color.Black, style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(8.dp))
+                if (loading) {
+                    MosPromLoadingBar(modifier = Modifier.fillMaxWidth(), containerColor = Color.White)
+                } else if (errorText != null) {
+                    Text(errorText!!, color = Color(0xFFB00020))
+                } else if (participants.isEmpty()) {
+                    Text("Пока нет участников", color = Color.Black)
+                } else {
+                    participants.forEach { user ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            val displayName = user.name?.takeIf { it.isNotBlank() }
+                                ?: user.telegramName.ifBlank { "ID: ${user.id}" }
+                            Text(
+                                text = displayName,
+                                color = Color.Black,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            if (isCreator) {
+                                Button(onClick = {
+                                    selectedUser = user
+                                }) { Text("Ачивка") }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (selectedUser != null && isCreator && p.clubId == currentClubId) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { selectedUser = null },
+            confirmButton = {
+                Button(onClick = {
+                    val uid = selectedUser!!.id
+                    val text = achText.trim()
+                    if (text.isNotEmpty()) {
+                        // fire and forget; in real app add error handling/Snackbar
+                        scope.launch {
+                            profileService.addAchievement(uid, text)
+                            selectedUser = null
+                            achText = ""
+                        }
+                    }
+                }) { Text("Добавить") }
+            },
+            dismissButton = { Button(onClick = { selectedUser = null }) { Text("Отмена") } },
+            title = { Text("Новая ачивка", color = Color.Black) },
+            text = {
+                OutlinedTextField(
+                    value = achText,
+                    onValueChange = { achText = it },
+                    label = {
+                        Text("Текст ачивки",
+                            color = Color.Black)
+                    },
+                    textStyle = TextStyle(
+                        color = Color.Black
+                    )
+                )
+            }
+        )
     }
 }

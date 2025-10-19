@@ -21,6 +21,7 @@ import dev.mos.prom.presentation.search.ui.SearchScreen
 import dev.mos.prom.presentation.splash.ui.SplashScreen
 import dev.mos.prom.presentation.ui.theme.MospromTheme
 import dev.mos.prom.presentation.chat.ui.ClubChatScreen
+import dev.mos.prom.presentation.notifications.ui.NotificationsScreen
 
 @Composable
 fun MosPromApp() {
@@ -130,6 +131,13 @@ fun MosPromApp() {
                         navController = navController,
                         innerPadding = innerPadding,
                         clubName = args.name,
+                    )
+                }
+
+                composable<Route.Notifications> {
+                    NotificationsScreen(
+                        navController = navController,
+                        innerPadding = innerPadding,
                     )
                 }
 

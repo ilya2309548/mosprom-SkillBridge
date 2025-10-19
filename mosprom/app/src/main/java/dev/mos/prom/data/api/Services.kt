@@ -79,6 +79,17 @@ class ProfileService(private val client: HttpClient) {
             setBody(PostUserTechnologiesRequest(userId = userId, technologies = technologyNames))
         }
     }
+
+    // Add achievement to a user
+    suspend fun addAchievement(userId: Long, text: String) {
+        client.post("/users/achievements") {
+            contentType(ContentType.Application.Json)
+            setBody(AddAchievementRequest(userId = userId, achievement = text))
+        }
+    }
+
+    // Get current user's achievements
+    suspend fun myAchievements(): List<String> = client.get("/me/achievements").body()
 }
 
 class ClubService(private val client: HttpClient) {
@@ -97,7 +108,6 @@ class ClubService(private val client: HttpClient) {
             }
         }.body()
     }
-
     suspend fun createClub(req: CreateClubRequest): ClubDto =
         client.post("/clubs") {
             contentType(ContentType.Application.Json)
@@ -167,4 +177,16 @@ class PostService(private val client: HttpClient) {
                 if (!type.isNullOrBlank()) parameters.append("type", type)
             }
         }.body()
+
+    suspend fun getParticipants(postId: Long): List<UserDto> =
+        client.get("/posts/$postId/participants").body()
+
+    suspend fun joinPost(postId: Long, userId: Long) {
+        client.post("/posts/join") {
+            contentType(ContentType.Application.Json)
+            setBody(JoinPostRequest(postId = postId, userId = userId))
+        }
+    }
+
+    suspend fun myJoinedPosts(): List<PostDto> = client.get("/me/posts").body()
 }
