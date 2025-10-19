@@ -164,3 +164,54 @@ func GetPostsByIDs(ids []uint) (map[uint]model.Post, error) {
 	}
 	return m, nil
 }
+
+// RecommendedUserRow holds user id and score for a post recommendation
+type RecommendedUserRow struct {
+	UserID uint    `gorm:"column:user_id"`
+	Score  float64 `gorm:"column:score"`
+	Tech   float64 `gorm:"column:tech_match"`
+	Rn     float64 `gorm:"column:rating_norm"`
+}
+
+// GetRecommendedUsersForPost computes score = alpha*TechMatch + beta*RatingNorm for each user with respect to a post
+// TechMatch = |UserTech ∩ EventTech| / |EventTech|
+// RatingNorm = rating/10 (rating is stored on users table)
+func GetRecommendedUsersForPost(postID uint, alpha, beta float64) ([]RecommendedUserRow, error) {
+	// We will compute event tech count once, user intersection per user, and combine with rating
+	q := `
+		WITH event_size AS (
+			SELECT COUNT(*)::float AS tot
+			FROM post_technologies pt
+			WHERE pt.post_id = ?
+		),
+		user_inter AS (
+			SELECT u.id AS user_id,
+				   COALESCE(x.inter, 0)::float AS inter
+			FROM users u
+			LEFT JOIN (
+				SELECT ut.user_id, COUNT(*) AS inter
+				FROM user_technologies ut
+				JOIN post_technologies pt ON pt.technology_id = ut.technology_id
+				WHERE pt.post_id = ?
+				GROUP BY ut.user_id
+			) x ON x.user_id = u.id
+		),
+		tech_score AS (
+			SELECT ui.user_id,
+				   CASE WHEN es.tot > 0 THEN ui.inter / es.tot ELSE 0 END AS tech_match
+			FROM user_inter ui CROSS JOIN event_size es
+		)
+		SELECT u.id AS user_id,
+			   ( ? * ts.tech_match + ? * (COALESCE(u.rating,0)/10.0) ) AS score,
+			   ts.tech_match AS tech_match,
+			   (COALESCE(u.rating,0)/10.0) AS rating_norm
+		FROM users u
+		JOIN tech_score ts ON ts.user_id = u.id
+		ORDER BY score DESC, u.id ASC`
+
+	var rows []RecommendedUserRow
+	if err := db.DB.Raw(q, postID, postID, alpha, beta).Scan(&rows).Error; err != nil {
+		return nil, err
+	}
+	return rows, nil
+}

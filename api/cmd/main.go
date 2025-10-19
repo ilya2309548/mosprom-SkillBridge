@@ -120,6 +120,7 @@ func main() {
 	// Posts
 	r.GET("/posts", postHandler.GetAllPosts)
 	r.GET("/posts/:id", postHandler.GetPostByID)
+	r.GET("/posts/:id/recommended_users", postHandler.RecommendedUsersForPost)
 	r.GET("/posts/club", postHandler.GetPostsByClubID)
 	r.POST("/posts/join", postHandler.Join)
 	r.POST("/posts", postHandler.CreatePost)

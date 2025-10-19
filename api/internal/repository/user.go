@@ -137,6 +137,17 @@ func GetUserAchievements(userID uint) ([]string, error) {
 	return user.Achievements, err
 }
 
+// GetUsersByIDsLight returns minimal user fields useful for recommendations
+func GetUsersByIDsLight(ids []uint) ([]model.User, error) {
+	if len(ids) == 0 {
+		return []model.User{}, nil
+	}
+	var users []model.User
+	err := db.DB.Select("id, telegram_name, name, description, photo, university, rating").
+		Where("id IN ?", ids).Find(&users).Error
+	return users, err
+}
+
 // GetParticipationCounts returns map of user_id -> events count from post_participants and the maximum events among all users
 func GetParticipationCounts() (map[uint]int64, int64, error) {
 	type row struct {

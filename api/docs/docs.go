@@ -1266,6 +1266,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/posts/{id}/recommended_users": {
+            "get": {
+                "description": "Returns users sorted by score = alpha*TechMatch + beta*UserRatingNorm",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Recommended users for post",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Post ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Weight for TechMatch (default 0.6)",
+                        "name": "alpha",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Weight for UserRatingNorm (default 0.4)",
+                        "name": "beta",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/service.RecommendedUser"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/posts/{id}/technologies": {
             "get": {
                 "security": [
@@ -2290,6 +2343,23 @@ const docTemplate = `{
                 },
                 "tech_match": {
                     "type": "number"
+                }
+            }
+        },
+        "service.RecommendedUser": {
+            "type": "object",
+            "properties": {
+                "rating_norm": {
+                    "type": "number"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "tech_match": {
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

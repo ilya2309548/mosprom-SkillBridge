@@ -203,3 +203,32 @@ func (s *PostService) RecommendedForUser(userID uint) ([]RecommendedPost, error)
 	}
 	return out, nil
 }
+
+type RecommendedUser struct {
+	UserID     uint    `json:"user_id"`
+	Score      float64 `json:"score"`
+	TechMatch  float64 `json:"tech_match"`
+	RatingNorm float64 `json:"rating_norm"`
+}
+
+// RecommendedUsersForPost returns users sorted by score for a given post
+// alpha and beta are weights; defaults (if zero) are alpha=0.6, beta=0.4
+func (s *PostService) RecommendedUsersForPost(postID uint, alpha, beta float64) ([]RecommendedUser, error) {
+	if alpha == 0 && beta == 0 {
+		alpha, beta = 0.6, 0.4
+	}
+	rows, err := repository.GetRecommendedUsersForPost(postID, alpha, beta)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]RecommendedUser, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, RecommendedUser{
+			UserID:     r.UserID,
+			Score:      r.Score,
+			TechMatch:  r.Tech,
+			RatingNorm: r.Rn,
+		})
+	}
+	return out, nil
+}

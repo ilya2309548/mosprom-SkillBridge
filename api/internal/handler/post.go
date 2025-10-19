@@ -483,6 +483,44 @@ func (h *PostHandler) GetPostParticipants(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
+// RecommendedUsersForPost returns recommended users for a post
+// @Summary Recommended users for post
+// @Description Returns users sorted by score = alpha*TechMatch + beta*UserRatingNorm
+// @Tags posts
+// @Produce json
+// @Param id path int true "Post ID"
+// @Param alpha query number false "Weight for TechMatch (default 0.6)"
+// @Param beta query number false "Weight for UserRatingNorm (default 0.4)"
+// @Success 200 {array} service.RecommendedUser
+// @Failure 400 {object} map[string]string
+// @Router /posts/{id}/recommended_users [get]
+func (h *PostHandler) RecommendedUsersForPost(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		return
+	}
+	alpha := 0.6
+	beta := 0.4
+	if v := c.Query("alpha"); v != "" {
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			alpha = f
+		}
+	}
+	if v := c.Query("beta"); v != "" {
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			beta = f
+		}
+	}
+	res, err := h.postService.RecommendedUsersForPost(uint(id), alpha, beta)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 // RecommendedPostsForMe returns posts sorted by technology match with current user
 // @Summary Recommended posts for me (by technologies)
 // @Description Returns posts sorted by TechMatch = |UserTech ∩ EventTech| / |EventTech|
