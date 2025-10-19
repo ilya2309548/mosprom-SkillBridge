@@ -36,4 +36,10 @@ sealed class ProfileEvent {
     }
 
     data object OnLogout : ProfileEvent()
+
+    // New events for technologies editing
+    data object LoadDirections : ProfileEvent()
+    data class SelectDirection(val id: Long) : ProfileEvent()
+    data class ToggleTechnology(val id: Long) : ProfileEvent()
+    data object SaveTechnologies : ProfileEvent()
 }

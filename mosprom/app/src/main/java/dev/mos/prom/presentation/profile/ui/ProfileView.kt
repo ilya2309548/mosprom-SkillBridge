@@ -111,17 +111,17 @@ fun ProfileView(
 
         // Блоки
         SectionHeader("О себе")
-    Text(state.userModel.description.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+        Text(state.userModel.description.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
 
-    SectionHeader("Образование")
-    Text(state.userModel.education.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), color = Color.Black)
+        SectionHeader("Образование")
+        Text(state.userModel.education.ifBlank { "—" }, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
 
-        SectionHeader("Направления")
+        SectionHeader("Технологии")
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            (state.userModel.directions.ifEmpty { listOf("—") }).forEach {
+            (state.userModel.technologies.ifEmpty { listOf("—") }).forEach {
                 AssistChip(
                     onClick = { },
                     label = {

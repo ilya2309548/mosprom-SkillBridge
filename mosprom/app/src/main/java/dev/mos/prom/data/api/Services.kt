@@ -68,10 +68,22 @@ class ProfileService(private val client: HttpClient) {
                 )
             )
         }.body()
+
+    // Replace user's technologies with provided list of technology NAMES (backend expects names and user_id)
+    suspend fun setTechnologies(userId: Long, technologyNames: List<String>) {
+        client.post("/users/technologies") {
+            contentType(ContentType.Application.Json)
+            setBody(PostUserTechnologiesRequest(userId = userId, technologies = technologyNames))
+        }
+    }
 }
 
 class ClubService(private val client: HttpClient) {
     suspend fun listDirections(): List<DirectionDto> = client.get("/directions").body()
+
+    // List technologies for a direction by its id
+    suspend fun technologiesByDirection(directionId: Long): List<TechnologyDto> =
+        client.get("/directions/$directionId/technologies").body()
 
     suspend fun listClubs(name: String?, directionNames: List<String>): List<ClubDto> {
         val directionsQuery = if (directionNames.isEmpty()) "" else directionNames.joinToString(",")

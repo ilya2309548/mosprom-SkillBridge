@@ -26,6 +26,10 @@ class ProfileRepository(private val api: ProfileService) {
     suspend fun myClubsCount(): Int = api.myClubs().size
 
     suspend fun myClubIds(): List<Long> = api.myClubs().map { it.id }
+
+    suspend fun setTechnologies(userId: Long, technologyNames: List<String>) {
+        api.setTechnologies(userId, technologyNames)
+    }
 }
 
 private fun dev.mos.prom.data.api.UserDto.toUserModel(): UserModel =
@@ -39,5 +43,6 @@ private fun dev.mos.prom.data.api.UserDto.toUserModel(): UserModel =
             // Backend serves photos by /photos/{filename}
             if (it.startsWith("http")) it else "http://81.29.146.35:8080/photos/$it"
         },
-        directions = (this.directions ?: emptyList()).mapNotNull { it.name }
+        directions = (this.directions ?: emptyList()).mapNotNull { it.name },
+        technologies = (this.technologies ?: emptyList()).mapNotNull { it.name }
     )

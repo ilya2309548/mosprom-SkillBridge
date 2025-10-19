@@ -66,3 +66,9 @@ data class CreateClubRequest(
     val description: String,
     val directions: List<String> = emptyList(),
 )
+
+@Serializable
+data class PostUserTechnologiesRequest(
+    @SerialName("user_id") val userId: Long,
+    val technologies: List<String>,
+)

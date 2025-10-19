@@ -11,4 +11,5 @@ data class UserModel (
     val achievements: List<String> = emptyList(),
     val photoUrl: String? = null,
     val directions: List<String> = emptyList(),
+    val technologies: List<String> = emptyList(),
 )

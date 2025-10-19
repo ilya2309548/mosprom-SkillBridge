@@ -12,4 +12,12 @@ data class ProfileState (
     val error: String? = null,
     val loggedOut: Boolean = false,
     val clubsCount: Int = 0,
+    // For editing technologies
+    val directions: List<DirectionItem> = emptyList(),
+    val selectedDirectionId: Long? = null,
+    val technologies: List<TechnologyItem> = emptyList(),
+    val selectedTechnologyIds: Set<Long> = emptySet(),
 )
+
+data class DirectionItem(val id: Long, val name: String)
+data class TechnologyItem(val id: Long, val name: String)

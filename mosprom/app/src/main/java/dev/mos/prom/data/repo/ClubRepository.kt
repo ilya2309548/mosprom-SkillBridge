@@ -5,11 +5,14 @@ import dev.mos.prom.data.api.ClubDto
 import dev.mos.prom.data.api.ClubService
 import dev.mos.prom.data.api.CreateClubRequest
 import dev.mos.prom.data.api.DirectionDto
+import dev.mos.prom.data.api.TechnologyDto
 
 
 
 class ClubRepository(private val api: ClubService) {
     suspend fun directions(): List<String> = api.listDirections().map(DirectionDto::name)
+
+    suspend fun directionsFull(): List<DirectionDto> = api.listDirections()
 
     suspend fun clubsByDirections(directions: List<String>): List<Club> =
         api.listClubs(name = null, directionNames = directions).map { it.toClub() }
@@ -30,6 +33,9 @@ class ClubRepository(private val api: ClubService) {
     }
 
     suspend fun subscribersCount(clubId: Long): Int = api.subscribers(clubId).size
+
+    suspend fun technologiesByDirection(directionId: Long): List<TechnologyDto> =
+        api.technologiesByDirection(directionId)
 }
 
 private fun ClubDto.toClub(): Club = Club(

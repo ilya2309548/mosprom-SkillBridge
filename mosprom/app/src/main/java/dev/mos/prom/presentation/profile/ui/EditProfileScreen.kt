@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
@@ -42,6 +44,7 @@ import dev.mos.prom.presentation.ui.text.MosPromLoadingBar
 import dev.mos.prom.utils.MosPromResult
 import dev.mos.prom.utils.navigation.MosPromTopBar
 import dev.mos.prom.R
+import dev.mos.prom.utils.navigation.Route
 import org.koin.compose.viewmodel.koinViewModel
 import java.io.InputStream
 import dev.mos.prom.utils.placeholderPainter
@@ -56,6 +59,7 @@ fun EditProfileScreen(
 
     LaunchedEffect(Unit) {
         viewModel.onEvent(ProfileEvent.OnLoadData)
+        viewModel.onEvent(ProfileEvent.LoadDirections)
     }
 
     when (state.status) {
@@ -100,6 +104,7 @@ fun EditProfileScreen(
                     Modifier
                         .padding(padding)
                         .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
                     // Avatar section with placeholder
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -137,9 +142,58 @@ fun EditProfileScreen(
 
                     MosTextField(label = "Образование", value = university, onValueChange = { university = it }, modifier = Modifier.padding(top = 12.dp))
 
+                    Spacer(Modifier.size(12.dp))
+                    Text("Направления", color = Color.Black, style = MaterialTheme.typography.titleMedium)
+
+                    // Directions chips
+                    val directions = state.directions
+                    if (directions.isNotEmpty()) {
+                        androidx.compose.foundation.layout.FlowRow(
+                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+                            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            directions.forEach { dir ->
+                                val selected = state.selectedDirectionId == dir.id
+                                androidx.compose.material3.AssistChip(
+                                    onClick = { viewModel.onEvent(ProfileEvent.SelectDirection(dir.id)) },
+                                    label = { Text(dir.name, color = if (selected) Color.White else Color.Black) },
+                                    colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                                        containerColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.size(12.dp))
+                    Text("Технологии", color = Color.Black, style = MaterialTheme.typography.titleMedium)
+
+                    // Technologies chips
+                    val techs = state.technologies
+                    if (techs.isNotEmpty()) {
+                        androidx.compose.foundation.layout.FlowRow(
+                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+                            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            techs.forEach { t ->
+                                val selected = t.id in state.selectedTechnologyIds
+                                androidx.compose.material3.AssistChip(
+                                    onClick = { viewModel.onEvent(ProfileEvent.ToggleTechnology(t.id)) },
+                                    label = { Text(t.name, color = if (selected) Color.White else Color.Black) },
+                                    colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                                        containerColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                                    )
+                                )
+                            }
+                        }
+                    }
+
                     Button(
                         onClick = {
                             lastSubmitted = true
+
                             viewModel.onEvent(
                                 ProfileEvent.OnUpdateProfile(
                                     name = name,
@@ -147,16 +201,19 @@ fun EditProfileScreen(
                                     university = university,
                                 )
                             )
+
+                            viewModel.onEvent(ProfileEvent.SaveTechnologies)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp)
-                    ) { Text("Сохранить", style = MaterialTheme.typography.labelLarge) }
+                    ) {
+                        Text("Сохранить", style = MaterialTheme.typography.labelLarge) }
 
                     LaunchedEffect(state.status, lastSubmitted) {
                         if (lastSubmitted) {
                             lastSubmitted = false
-                            navController.popBackStack()
+                            navController.navigate(Route.Profile)
                         }
                     }
                 }
