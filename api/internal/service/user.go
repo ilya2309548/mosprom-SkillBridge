@@ -50,13 +50,20 @@ func (s *UserService) CreateUser(input CreateUserInput) (model.User, error) {
 	if err != nil {
 		return model.User{}, err
 	}
+
+	achievements := input.Achievements
+	if achievements == nil {
+		achievements = []string{}
+	}
+	achievements = append(achievements, "🎉 Joined the community! First step to becoming a tech superstar!")
+
 	user := model.User{
 		TelegramName: input.TelegramName,
 		Name:         input.Name,
 		Password:     input.Password,
 		Description:  input.Description,
 		Photo:        input.PhotoPath,
-		Achievements: input.Achievements,
+		Achievements: achievements,
 		EventsCount:  input.EventsCount,
 		University:   input.University,
 		Technologies: techs,
@@ -158,4 +165,10 @@ func (s *UserService) SetUserTechnologies(userID uint, names []string) ([]model.
 		return nil, err
 	}
 	return techs, nil
+}
+func (s *UserService) GetUserAchievements(userID uint) ([]string, error) {
+	return repository.GetUserAchievements(userID)
+}
+func (s *UserService) AddAchievementToUser(userID uint, achievement string) error {
+	return repository.AddAchievementToUser(userID, achievement)
 }

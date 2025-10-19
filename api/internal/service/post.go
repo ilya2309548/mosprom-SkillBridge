@@ -164,3 +164,7 @@ func (s *PostService) LikePost(postID, userID uint) error {
 func (s *PostService) UnlikePost(postID, userID uint) error {
 	return repository.DeleteLike(userID, postID)
 }
+
+func (s *PostService) GetPostParticipants(postID uint) ([]model.User, error) {
+	return repository.GetPostParticipants(postID)
+}

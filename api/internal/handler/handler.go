@@ -593,3 +593,93 @@ func GetTechnologiesByDirection(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, techs)
 }
+
+type AddUserAchievementRequest struct {
+	UserID      uint   `json:"user_id" binding:"required"`
+	Achievement string `json:"achievement" binding:"required"`
+}
+
+// AddUserAchievement godoc
+// @Summary Add achievement to user
+// @Description Add a new achievement to the user's achievements list
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param input body handler.AddUserAchievementRequest true "User ID and achievement"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/achievements [post]
+func AddUserAchievement(c *gin.Context) {
+	var body AddUserAchievementRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := userService.AddAchievementToUser(body.UserID, body.Achievement); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Achievement added successfully"})
+}
+
+// GetUserAchievements godoc
+// @Summary Get user achievements
+// @Description Get achievements of a user by user ID
+// @Tags users
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {array} string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/{id}/achievements [get]
+func GetUserAchievements(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	achievements, err := userService.GetUserAchievements(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, achievements)
+}
+
+// GetMyAchievements godoc
+// @Summary Get current user achievements
+// @Description Get achievements of the current authenticated user
+// @Tags profile
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {array} string
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /me/achievements [get]
+func GetMyAchievements(c *gin.Context) {
+	uidAny, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	uid, ok := uidAny.(uint)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	achievements, err := userService.GetUserAchievements(uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, achievements)
+}

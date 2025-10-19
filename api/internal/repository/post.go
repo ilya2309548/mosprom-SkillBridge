@@ -75,7 +75,6 @@ func JoinUserToPost(userID, postID uint) error {
 	})
 }
 
-// GetUserJoinedPosts returns posts that the user participates in
 func GetUserJoinedPosts(userID uint) ([]model.Post, error) {
 	var posts []model.Post
 	err := db.DB.Model(&model.Post{}).
@@ -86,7 +85,6 @@ func GetUserJoinedPosts(userID uint) ([]model.Post, error) {
 	return posts, err
 }
 
-// ReplacePostTechnologies sets technologies for a post using technology names
 func ReplacePostTechnologies(postID uint, techs []model.Technology) error {
 	var post model.Post
 	if err := db.DB.First(&post, postID).Error; err != nil {
@@ -95,7 +93,6 @@ func ReplacePostTechnologies(postID uint, techs []model.Technology) error {
 	return db.DB.Model(&post).Association("Technologies").Replace(&techs)
 }
 
-// GetTechnologiesByPostID returns technologies linked to a given post
 func GetTechnologiesByPostID(postID uint) ([]model.Technology, error) {
 	var techs []model.Technology
 	err := db.DB.Model(&model.Technology{}).
@@ -103,4 +100,13 @@ func GetTechnologiesByPostID(postID uint) ([]model.Technology, error) {
 		Where("pt.post_id = ?", postID).
 		Find(&techs).Error
 	return techs, err
+}
+func GetPostParticipants(postID uint) ([]model.User, error) {
+	var users []model.User
+	err := db.DB.Model(&model.Post{}).
+		Where("posts.id = ?", postID).
+		Joins("JOIN post_participants pp ON pp.post_id = posts.id").
+		Joins("JOIN users ON users.id = pp.user_id").
+		Find(&users).Error
+	return users, err
 }

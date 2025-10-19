@@ -449,3 +449,35 @@ func (h *PostHandler) UnlikePost(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Post unliked successfully"})
 }
+
+// GetPostParticipants retrieves participants for a post
+// @Summary Get participants for a post
+// @Description Get participants for a post by post ID
+// @Tags posts
+// @Produce json
+// @Param id path int true "Post ID"
+// @Success 200 {array} model.User
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /posts/{id}/participants [get]
+func (h *PostHandler) GetPostParticipants(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		return
+	}
+
+	users, err := h.postService.GetPostParticipants(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	for i := range users {
+		users[i].Password = ""
+	}
+
+	c.JSON(http.StatusOK, users)
+}

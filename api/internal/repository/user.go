@@ -99,7 +99,6 @@ func GetUserByTelegram(tg string) (model.User, error) {
 	return user, err
 }
 
-// ReplaceUserTechnologies replaces only the Technologies association for the user
 func ReplaceUserTechnologies(userID uint, technologies []model.Technology) error {
 	var user model.User
 	if err := db.DB.First(&user, userID).Error; err != nil {
@@ -116,4 +115,16 @@ func GetTechnologiesByUserID(userID uint) ([]model.Technology, error) {
 		Where("ut.user_id = ?", userID).
 		Find(&techs).Error
 	return techs, err
+}
+func AddAchievementToUser(userID uint, achievement string) error {
+	return db.DB.Model(&model.User{}).
+		Where("id = ?", userID).
+		Update("achievements", gorm.Expr("array_append(achievements, ?)", achievement)).
+		Error
+}
+
+func GetUserAchievements(userID uint) ([]string, error) {
+	var user model.User
+	err := db.DB.Select("achievements").Where("id = ?", userID).First(&user).Error
+	return user.Achievements, err
 }

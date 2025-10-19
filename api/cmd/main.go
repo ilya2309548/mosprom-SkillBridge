@@ -20,7 +20,7 @@ import (
 	"2gis-calm-map/api/internal/websockets"
 )
 
-// @title 2gis-calm-map API
+// @title Mosprom API
 // @version 1.0
 // @description This is a sample server.
 // @host localhost:8080
@@ -97,6 +97,10 @@ func main() {
 	r.POST("/users/technologies", handler.PostUserTechnologies)
 	// User technologies
 	r.GET("/users/:id/technologies", handler.GetUserTechnologies)
+	// Add achievement to user
+	r.POST("/users/achievements", handler.AddUserAchievement)
+	// Get user achievements
+	r.GET("/users/:id/achievements", handler.GetUserAchievements)
 
 	// Public photos access by filename
 	r.GET("/photos/:filename", handler.GetPhotoByName)
@@ -118,6 +122,7 @@ func main() {
 	r.GET("/posts/club", postHandler.GetPostsByClubID)
 	r.POST("/posts/join", postHandler.Join)
 	r.POST("/posts", postHandler.CreatePost)
+	r.GET("/posts/:id/participants", postHandler.GetPostParticipants)
 
 	// Secured post routes
 	postAuth := r.Group("/posts")
@@ -155,6 +160,8 @@ func main() {
 		auth.GET("/me/clubs", handler.GetUserClubs)
 		// Current user's joined posts
 		auth.GET("/me/posts", postHandler.JoinedByMe)
+		// Current user's achievements
+		auth.GET("/me/achievements", handler.GetMyAchievements)
 	}
 
 	// Get clubs of a specific user by id
