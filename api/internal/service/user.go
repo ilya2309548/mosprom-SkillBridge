@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"math"
 	"mosprom/api/internal/model"
 	"mosprom/api/internal/repository"
 )
@@ -25,6 +26,11 @@ type CreateUserInput struct {
 	University   string
 	Technologies []string // имена
 	Directions   []string // имена
+
+	// RecomputeAllRatings recalculates rating for all users:
+	// R = (0.4*A_norm + 0.6*E_norm) * 10,
+	// A_norm = log(1+events)/log(1+maxEvents),
+	// E_norm = achievements / events^0.7 (with E_norm=0 if events==0)
 }
 
 type UpdateUserInput struct {
@@ -171,4 +177,59 @@ func (s *UserService) GetUserAchievements(userID uint) ([]string, error) {
 }
 func (s *UserService) AddAchievementToUser(userID uint, achievement string) error {
 	return repository.AddAchievementToUser(userID, achievement)
+}
+
+// RecomputeAllRatings recalculates and updates rating for all users.
+// Rating formula:
+// R = (0.4 * Anorm + 0.6 * Enorm) * 10
+// where Anorm = log(1 + events) / log(1 + maxEvents)
+//
+//	Enorm = achievements / (events ^ 0.7)
+//
+// posts (events) are rows in post_participants, achievements are strings in users.achievements
+func (s *UserService) RecomputeAllRatings() error {
+	// Get participation counts for all users and max
+	eventsMap, maxEvents, err := repository.GetParticipationCounts()
+	if err != nil {
+		return err
+	}
+	// Avoid division by zero for Anorm denominator
+	denom := math.Log(1 + float64(maxEvents))
+
+	// Fetch all users (id + achievements) to compute Enorm
+	users, err := repository.GetAllUsersLight()
+	if err != nil {
+		return err
+	}
+
+	for _, u := range users {
+		events := float64(eventsMap[u.ID])
+		var Anorm float64
+		if denom > 0 {
+			Anorm = math.Log(1+events) / denom
+		} else {
+			Anorm = 0
+		}
+		// achievements count from array column
+		ach := float64(len(u.Achievements))
+		// Enorm with diminishing returns; treat 0 events as 1 to avoid div by zero
+		ebase := events
+		if ebase <= 0 {
+			ebase = 1
+		}
+		Enorm := ach / math.Pow(ebase, 0.7)
+
+		rating := (0.4*Anorm + 0.6*Enorm) * 10.0
+		// clamp to [0,10]
+		if rating < 0 {
+			rating = 0
+		}
+		if rating > 10 {
+			rating = 10
+		}
+		if err := repository.UpdateUserRating(u.ID, rating); err != nil {
+			return err
+		}
+	}
+	return nil
 }

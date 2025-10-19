@@ -1,9 +1,12 @@
 package service
 
 import (
+	"errors"
 	"mosprom/api/internal/model"
 	"mosprom/api/internal/repository"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type PostService struct{}
@@ -149,7 +152,7 @@ func (s *PostService) LikePost(postID, userID uint) error {
 	if err == nil {
 		return nil
 	}
-	if err != nil && err.Error() != "record not found" {
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 

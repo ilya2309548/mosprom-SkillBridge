@@ -89,6 +89,7 @@ func main() {
 	// Users CRUD
 	r.GET("/users", handler.GetUsers)
 	r.POST("/users", handler.CreateUser)
+	r.POST("/users/recompute_ratings", handler.RecomputeUserRatings)
 	r.GET("/users/:id", handler.GetUserByID)
 	r.PUT("/users/:id", handler.UpdateUser)
 	r.PATCH("/users/:id", handler.UpdateUser)

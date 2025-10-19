@@ -23,6 +23,8 @@ type User struct {
 	// Post participation (e.g., activities, projects, etc.)
 	Posts []Post `json:"posts" gorm:"many2many:post_participants;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Likes []Like `json:"likes" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	// Rating — вычисляемый показатель вовлеченности пользователя [0..10]
+	Rating float64 `json:"rating" gorm:"type:double precision;default:0"`
 }
 
 type Technology struct {

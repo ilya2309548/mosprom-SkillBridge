@@ -14,6 +14,14 @@ func GetAllUsers() ([]model.User, error) {
 	return users, err
 }
 
+// GetAllUsersLight returns users with only fields needed for rating calculation
+func GetAllUsersLight() ([]model.User, error) {
+	var users []model.User
+	// select minimal columns: id and achievements (array)
+	err := db.DB.Select("id, achievements").Find(&users).Error
+	return users, err
+}
+
 func CreateUser(user *model.User) error {
 	return db.DB.Create(user).Error
 }
@@ -127,4 +135,34 @@ func GetUserAchievements(userID uint) ([]string, error) {
 	var user model.User
 	err := db.DB.Select("achievements").Where("id = ?", userID).First(&user).Error
 	return user.Achievements, err
+}
+
+// GetParticipationCounts returns map of user_id -> events count from post_participants and the maximum events among all users
+func GetParticipationCounts() (map[uint]int64, int64, error) {
+	type row struct {
+		UserID uint  `gorm:"column:user_id"`
+		Cnt    int64 `gorm:"column:cnt"`
+	}
+	var rows []row
+	err := db.DB.Table("post_participants").
+		Select("user_id, COUNT(*) as cnt").
+		Group("user_id").
+		Find(&rows).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	m := make(map[uint]int64, len(rows))
+	var max int64 = 0
+	for _, r := range rows {
+		m[r.UserID] = r.Cnt
+		if r.Cnt > max {
+			max = r.Cnt
+		}
+	}
+	return m, max, nil
+}
+
+// UpdateUserRating updates only the rating column for a user
+func UpdateUserRating(userID uint, rating float64) error {
+	return db.DB.Model(&model.User{}).Where("id = ?", userID).Update("rating", rating).Error
 }

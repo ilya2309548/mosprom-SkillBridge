@@ -683,3 +683,19 @@ func GetMyAchievements(c *gin.Context) {
 
 	c.JSON(http.StatusOK, achievements)
 }
+
+// RecomputeUserRatings godoc
+// @Summary Recompute user ratings
+// @Description Recalculate rating for all users based on participation and achievements
+// @Tags users
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/recompute_ratings [post]
+func RecomputeUserRatings(c *gin.Context) {
+	if err := userService.RecomputeAllRatings(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}

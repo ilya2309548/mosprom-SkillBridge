@@ -1519,6 +1519,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/recompute_ratings": {
+            "post": {
+                "description": "Recalculate rating for all users based on participation and achievements",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Recompute user ratings",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/technologies": {
             "post": {
                 "consumes": [
@@ -2154,6 +2186,10 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/model.Post"
                     }
+                },
+                "rating": {
+                    "description": "Rating — вычисляемый показатель вовлеченности пользователя [0..10]",
+                    "type": "number"
                 },
                 "technologies": {
                     "type": "array",
