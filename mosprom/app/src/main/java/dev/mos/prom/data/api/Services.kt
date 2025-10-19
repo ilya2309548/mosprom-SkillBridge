@@ -159,4 +159,12 @@ class PostService(private val client: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(req)
         }.body()
+
+    suspend fun getPostsByClub(clubId: Long, type: String? = null): List<PostDto> =
+        client.get("/posts/club") {
+            url {
+                parameters.append("club_id", clubId.toString())
+                if (!type.isNullOrBlank()) parameters.append("type", type)
+            }
+        }.body()
 }

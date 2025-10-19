@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -25,13 +27,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,12 +48,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import dev.mos.prom.R
+import dev.mos.prom.data.api.PostDto
+import dev.mos.prom.data.api.PostService
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsEvent
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsViewModel
 import dev.mos.prom.presentation.ui.text.MosPromLoadingBar
 import dev.mos.prom.utils.navigation.MosPromTopBar
 import dev.mos.prom.utils.navigation.Route
 import dev.mos.prom.utils.placeholderPainter
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -221,74 +227,145 @@ fun ClubDetailsScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            TabRow(
+            val postTypes = listOf(
+                "informational" to "Информационные",
+                "project" to "Проекты",
+                "internship" to "Стажировки",
+                "educational" to "Образовательные",
+                "activity" to "Мероприятия",
+                "vacancy" to "Вакансии",
+            )
+
+            val pagerState = rememberPagerState(pageCount = { postTypes.size }, initialPage = tabIndex)
+
+            ScrollableTabRow(
                 modifier = Modifier
                     .fillMaxWidth(),
-                selectedTabIndex = tabIndex,
+                selectedTabIndex = pagerState.currentPage,
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                edgePadding = 8.dp
             ) {
-                Tab(
-                    selected = tabIndex == 0,
-                    onClick = { tabIndex = 0 },
-                    text = { Text("Посты", style = MaterialTheme.typography.labelLarge)
-                })
-                Tab(
-                    selected = tabIndex == 1,
-                    onClick = { tabIndex = 1 },
-                    text = { Text("События", style = MaterialTheme.typography.labelLarge)
-                })
+                postTypes.forEachIndexed { index, (_, label) ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = { tabIndex = index },
+                        text = { Text(label, style = MaterialTheme.typography.labelLarge) }
+                    )
+                }
             }
 
             Spacer(Modifier.height(12.dp))
 
-            when (tabIndex) {
-                0 -> {
-                    MosPromLoadingBar(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        containerColor = Color.White
-                    )
+            // Sync tabIndex with pager
+            LaunchedEffect(tabIndex) { if (pagerState.currentPage != tabIndex) pagerState.scrollToPage(tabIndex) }
+            LaunchedEffect(pagerState.currentPage) { if (tabIndex != pagerState.currentPage) tabIndex = pagerState.currentPage }
 
-//                    Column (
-//                        modifier = Modifier
-//                            .fillMaxWidth(),
-//                        horizontalAlignment = Alignment.CenterHorizontally
-//                    ) {
-//                        Image(
-//                            painter = painterResource(R.drawable.ic_no_posts),
-//                            contentDescription = null,
-//                            modifier = Modifier
-//                                .width(140.dp)
-//                                .padding(vertical = 24.dp),
-//                            contentScale = ContentScale.FillWidth
-//                        )
-//                    }
+            // Fetch all posts once for the club
+            val postService: PostService = koinInject()
+            var allPosts by remember { mutableStateOf<List<PostDto>>(emptyList()) }
+            var loading by remember { mutableStateOf(false) }
+            var error by remember { mutableStateOf<String?>(null) }
 
+            LaunchedEffect(id) {
+                loading = true
+                error = null
+                try {
+                    allPosts = postService.getPostsByClub(id)
+                } catch (t: Throwable) {
+                    error = t.message
+                    allPosts = emptyList()
+                } finally {
+                    loading = false
                 }
-                1 -> {
+            }
+
+            HorizontalPager(state = pagerState) { page ->
+                val type = postTypes.getOrNull(page)?.first
+                val filtered = remember(allPosts, type) { allPosts.filter { p -> type == null || p.type.equals(type, ignoreCase = true) } }
+
+                if (loading) {
                     MosPromLoadingBar(
                         modifier = Modifier
                             .fillMaxWidth(),
                         containerColor = Color.White
                     )
-
-//                    Column (
-//                        modifier = Modifier
-//                            .fillMaxWidth(),
-//                        horizontalAlignment = Alignment.CenterHorizontally
-//                    ) {
-//                        Image(
-//                            painter = painterResource(R.drawable.ic_no_posts),
-//                            contentDescription = null,
-//                            modifier = Modifier
-//                                .width(140.dp)
-//                                .padding(vertical = 24.dp),
-//                            contentScale = ContentScale.FillWidth
-//                        )
-//                    }
+                } else if (error != null) {
+                    Text(error!!, color = Color(0xFFB00020))
+                } else if (filtered.isEmpty()) {
+                    Text("Нет постов", color = Color.Black, style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        filtered.forEach { p: PostDto -> PostCard(p) }
+                    }
                 }
             }
             Spacer(Modifier.height(80.dp))
+        }
+    }
+}
+
+@Composable
+private fun PostCard(p: PostDto) {
+    androidx.compose.material3.Card(
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(12.dp)) {
+            Text(p.title, color = Color.Black, style = MaterialTheme.typography.titleMedium)
+            if (!p.description.isNullOrBlank()) {
+                Spacer(Modifier.height(4.dp))
+                Text(p.description!!, color = Color.Black, style = MaterialTheme.typography.bodyMedium)
+            }
+            Spacer(Modifier.height(6.dp))
+            // Type and Format
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                androidx.compose.material3.AssistChip(
+                    onClick = {}, enabled = false,
+                    label = { Text(p.type, color = Color.Black, style = MaterialTheme.typography.labelSmall) },
+                    border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.25f))
+                )
+                p.format?.let {
+                    androidx.compose.material3.AssistChip(
+                        onClick = {}, enabled = false,
+                        label = { Text(if (it == "in_person") "Очно" else "Онлайн", color = Color.Black, style = MaterialTheme.typography.labelSmall) },
+                        border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.25f))
+                    )
+                }
+            }
+
+            // Image (if provided as URL/path)
+            p.image?.takeIf { it.isNotBlank() }?.let { img ->
+                Spacer(Modifier.height(8.dp))
+                AsyncImage(
+                    model = img,
+                    contentDescription = null,
+                    placeholder = placeholderPainter(),
+                    error = placeholderPainter(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                )
+            }
+
+            // Technologies
+            if (p.technologies.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    p.technologies.forEach { t ->
+                        androidx.compose.material3.AssistChip(
+                            onClick = {}, enabled = false,
+                            label = { Text(t.name, color = Color.Black, style = MaterialTheme.typography.labelSmall) },
+                            border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.25f))
+                        )
+                    }
+                }
+            }
+
+            // Address
+            p.address?.takeIf { it.isNotBlank() }?.let {
+                Spacer(Modifier.height(8.dp))
+                Text("Адрес: $it", color = Color.Black, style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

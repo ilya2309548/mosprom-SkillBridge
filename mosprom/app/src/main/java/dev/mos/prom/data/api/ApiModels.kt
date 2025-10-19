@@ -89,4 +89,16 @@ data class CreatePostApiRequest(
 @Serializable
 data class PostDto(
     val id: Long,
+    val title: String,
+    val description: String? = null,
+    val type: String,
+    @SerialName("start_date") val startDate: String? = null,
+    @SerialName("end_date") val endDate: String? = null,
+    @SerialName("age_restriction") val ageRestriction: Int? = null,
+    val format: String? = null,
+    val address: String? = null,
+    @SerialName("club_id") val clubId: Long,
+    @SerialName("participants_count") val participantsCount: Int = 0,
+    val technologies: List<TechnologyDto> = emptyList(),
+    val image: String? = null,
 )
