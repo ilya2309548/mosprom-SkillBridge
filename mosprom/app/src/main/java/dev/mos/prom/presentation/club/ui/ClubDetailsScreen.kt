@@ -319,7 +319,7 @@ fun ClubDetailsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PostCard(p: PostDto, isCreator: Boolean, currentClubId: Long) {
+fun PostCard(p: PostDto, isCreator: Boolean, currentClubId: Long) {
     // Hoisted state/services so they are available for menu and bottom sheet
     var menuExpanded by remember { mutableStateOf(false) }
     var showParticipants by remember { mutableStateOf(false) }

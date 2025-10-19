@@ -10,12 +10,17 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.path
-import io.ktor.http.path
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
 
 class AuthService(private val client: HttpClient) {
     suspend fun login(req: LoginRequest): LoginResponse =
@@ -189,4 +194,32 @@ class PostService(private val client: HttpClient) {
     }
 
     suspend fun myJoinedPosts(): List<PostDto> = client.get("/me/posts").body()
+
+    suspend fun myRecommendedPosts(): List<PostDto> = client.get("/me/posts/recommended").body()
+
+    suspend fun getPostById(postId: Long): PostDto = client.get("/posts/$postId").body()
+
+    // Robust fetch: try decode directly; on failure, attempt to parse IDs and fetch individually; fallback to joined posts
+    suspend fun myRecommendedPostsFull(): List<PostDto> {
+        return try {
+            myRecommendedPosts()
+        } catch (_: Throwable) {
+            // Try parse as raw JSON to extract ids
+            val txt = client.get("/me/posts/recommended").bodyAsText()
+            val json = Json { ignoreUnknownKeys = true; isLenient = true; coerceInputValues = true }
+            val ids: List<Long> = try {
+                val arr = json.parseToJsonElement(txt).jsonArray
+                arr.mapNotNull { el ->
+                    when {
+                        el is kotlinx.serialization.json.JsonPrimitive && el.isString.not() -> el.longOrNull
+                        el is kotlinx.serialization.json.JsonPrimitive && el.isString -> el.content.toLongOrNull()
+                        el.jsonObject["id"] != null -> el.jsonObject["id"]!!.jsonPrimitive.longOrNull
+                        else -> null
+                    }
+                }
+            } catch (_: Throwable) { emptyList() }
+            if (ids.isNotEmpty()) ids.mapNotNull { runCatching { getPostById(it) }.getOrNull() }
+            else myJoinedPosts()
+        }
+    }
 }

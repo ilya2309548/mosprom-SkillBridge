@@ -22,6 +22,7 @@ import dev.mos.prom.presentation.splash.ui.SplashScreen
 import dev.mos.prom.presentation.ui.theme.MospromTheme
 import dev.mos.prom.presentation.chat.ui.ClubChatScreen
 import dev.mos.prom.presentation.notifications.ui.NotificationsScreen
+import dev.mos.prom.presentation.main.ui.MainScreen
 
 @Composable
 fun MosPromApp() {
@@ -36,6 +37,12 @@ fun MosPromApp() {
                 navController = navController,
                 startDestination = Route.Splash,
             ) {
+                composable<Route.Main> {
+                    MainScreen(
+                        navController = navController,
+                        innerPadding = innerPadding,
+                    )
+                }
                 composable<Route.Splash>(
                     exitTransition = { slideOutHorizontally() },
                     popEnterTransition = { slideInHorizontally() }

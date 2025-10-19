@@ -169,16 +169,8 @@ fun ProfileScreen (
                         androidx.compose.foundation.layout.Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(0.dp)
-                                .then(Modifier),
+                                .background(overlayColor!!)
                         ) {
-                            // Background color
-                            androidx.compose.foundation.layout.Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(overlayColor!!)
-                            )
-
                             // Top-left back button
                             IconButton(
                                 onClick = { selectedAchievement = null },
