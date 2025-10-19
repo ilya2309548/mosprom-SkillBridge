@@ -195,6 +195,9 @@ class PostService(private val client: HttpClient) {
 
     suspend fun myJoinedPosts(): List<PostDto> = client.get("/me/posts").body()
 
+    // Preferred: backend returns service.RecommendedPost objects
+    suspend fun myRecommendedPostsRaw(): List<RecommendedPostDto> = client.get("/me/posts/recommended").body()
+    // Legacy/simple: sometimes endpoint returned just PostDto[] or ids
     suspend fun myRecommendedPosts(): List<PostDto> = client.get("/me/posts/recommended").body()
 
     suspend fun getPostById(postId: Long): PostDto = client.get("/posts/$postId").body()
@@ -222,4 +225,8 @@ class PostService(private val client: HttpClient) {
             else myJoinedPosts()
         }
     }
+
+    // Recommended users for a given post
+    suspend fun recommendedUsersForPost(postId: Long): List<RecommendedUserDto> =
+        client.get("/posts/$postId/recommended_users").body()
 }

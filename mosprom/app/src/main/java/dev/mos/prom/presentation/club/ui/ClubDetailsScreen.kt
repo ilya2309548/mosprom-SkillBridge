@@ -5,6 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -332,6 +334,7 @@ fun PostCard(p: PostDto, isCreator: Boolean, currentClubId: Long) {
     val profileRepo: dev.mos.prom.data.repo.ProfileRepository = koinInject()
     var joinLoading by remember { mutableStateOf(false) }
     var joined by remember { mutableStateOf(false) }
+    var liked by remember { mutableStateOf(false) }
     androidx.compose.material3.Card(
         colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         modifier = Modifier.fillMaxWidth()
@@ -340,6 +343,14 @@ fun PostCard(p: PostDto, isCreator: Boolean, currentClubId: Long) {
 
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(p.title, color = Color.Black, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                // Mock like toggle icon
+                IconButton(onClick = { liked = !liked }) {
+                    Icon(
+                        imageVector = if (liked) androidx.compose.material.icons.Icons.Filled.Favorite else androidx.compose.material.icons.Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Лайк",
+                        tint = if (liked) Color(0xFFE91E63) else Color.Gray
+                    )
+                }
                 if (isCreator && p.clubId == currentClubId) {
                     IconButton(onClick = { menuExpanded = true }) {
                         Icon(Icons.Filled.MoreVert, contentDescription = "Ещё")

@@ -103,6 +103,22 @@ data class PostDto(
     val image: String? = null,
 )
 
+// Recommended posts response shape
+@Serializable
+data class RecommendedPostDto(
+    val post: PostDto,
+    @SerialName("tech_match") val techMatch: Double? = null,
+)
+
+// Recommended users for a post response shape
+@Serializable
+data class RecommendedUserDto(
+    @SerialName("user_id") val userId: Long,
+    val score: Double? = null,
+    @SerialName("tech_match") val techMatch: Double? = null,
+    @SerialName("rating_norm") val ratingNorm: Double? = null,
+)
+
 // Achievements
 @Serializable
 data class AddAchievementRequest(

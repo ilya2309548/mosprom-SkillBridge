@@ -3,9 +3,10 @@ package dev.mos.prom.presentation.post.ui
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,10 +24,12 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,11 +47,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.mos.prom.R
+import dev.mos.prom.data.api.ClubService
 import dev.mos.prom.data.api.CreatePostApiRequest
 import dev.mos.prom.data.api.DirectionDto
 import dev.mos.prom.data.api.PostService
+import dev.mos.prom.data.api.RecommendedUserDto
 import dev.mos.prom.data.api.TechnologyDto
-import dev.mos.prom.data.api.ClubService
 import dev.mos.prom.utils.navigation.MosPromTopBar
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -116,6 +120,11 @@ fun CreatePostScreen(
 
     var isSubmitting by remember { mutableStateOf(false) }
     var submitError by remember { mutableStateOf<String?>(null) }
+
+    // Bottom sheet state for recommended users
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSheet by remember { mutableStateOf(false) }
+    var recommended by remember { mutableStateOf<List<RecommendedUserDto>>(emptyList()) }
 
     // Directions and Technologies state
     var directions by remember { mutableStateOf<List<DirectionDto>>(emptyList()) }
@@ -331,8 +340,9 @@ fun CreatePostScreen(
                                 technologies = technologiesNames,
                             )
                             val created = postService.createPost(req)
-                            // Navigate back to club page
-                            navController.popBackStack()
+                            // Fetch recommended users for the created post and show sheet
+                            recommended = runCatching { postService.recommendedUsersForPost(created.id) }.getOrElse { emptyList() }
+                            showSheet = true
                         } catch (t: Throwable) {
                             submitError = t.message ?: t.toString()
                         } finally {
@@ -346,6 +356,43 @@ fun CreatePostScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(if (isSubmitting) "Создание…" else "Создать", color = Color.Black)
+            }
+
+            if (showSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        showSheet = false
+                        // After closing, go back to the club page
+                        navController.popBackStack()
+                    },
+                    sheetState = sheetState
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text("Кого пригласить?", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+                        if (recommended.isEmpty()) {
+                            Text("Подходящих пользователей пока нет", color = Color.Black)
+                        } else {
+                            recommended.take(20).forEach { r ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("user #${r.userId}", color = Color.Black)
+                                    TextButton(onClick = { /* TODO: call invite endpoint when available */ }) {
+                                        Text("Пригласить")
+                                    }
+                                }
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
             }
         }
     }
