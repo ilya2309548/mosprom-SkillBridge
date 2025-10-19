@@ -14,7 +14,7 @@ func CreateClub(club *model.Club) error {
 
 func GetClubByName(name string) (model.Club, error) {
 	var club model.Club
-	err := db.DB.Preload("Directions").Preload("Events").Preload("Creator").Where("name = ?", name).First(&club).Error
+	err := db.DB.Preload("Directions").Preload("Creator").Where("name = ?", name).First(&club).Error
 	return club, err
 }
 
@@ -22,14 +22,14 @@ func ListClubsByDirections(directionNames []string) ([]model.Club, error) {
 	var clubs []model.Club
 	if len(directionNames) == 0 {
 		// return all with preloads
-		err := db.DB.Preload("Directions").Preload("Events").Preload("Creator").Find(&clubs).Error
+		err := db.DB.Preload("Directions").Preload("Creator").Find(&clubs).Error
 		return clubs, err
 	}
 	// join directions via club_directions to filter by names
 	err := db.DB.Joins("JOIN club_directions cd ON cd.club_id = clubs.id").
 		Joins("JOIN directions d ON d.id = cd.direction_id").
 		Where("d.name IN ?", directionNames).
-		Preload("Directions").Preload("Events").Preload("Creator").
+		Preload("Directions").Preload("Creator").
 		Group("clubs.id").
 		Find(&clubs).Error
 	return clubs, err
@@ -43,7 +43,7 @@ func SetClubLogo(clubID uint, filename string) error {
 func ListClubsFiltered(name *string, directions []string) ([]model.Club, error) {
 	var clubs []model.Club
 	q := db.DB.Model(&model.Club{}).
-		Preload("Directions").Preload("Events").Preload("Creator")
+		Preload("Directions").Preload("Creator")
 
 	if name != nil && strings.TrimSpace(*name) != "" {
 		q = q.Where("clubs.name = ?", strings.TrimSpace(*name))
@@ -126,7 +126,7 @@ func GetUserClubs(userID uint) ([]model.Club, error) {
 	err := db.DB.Model(&model.Club{}).
 		Joins("JOIN club_subscribers cs ON cs.club_id = clubs.id").
 		Where("cs.user_id = ?", userID).
-		Preload("Directions").Preload("Events").Preload("Creator").
+		Preload("Directions").Preload("Creator").
 		Find(&clubs).Error
 	return clubs, err
 }
@@ -134,6 +134,6 @@ func GetUserClubs(userID uint) ([]model.Club, error) {
 // GetClubByChatID returns a club by its chat ID
 func GetClubByChatID(chatID string) (model.Club, error) {
 	var club model.Club
-	err := db.DB.Preload("Directions").Preload("Events").Preload("Creator").Where("chat_id = ?", chatID).First(&club).Error
+	err := db.DB.Preload("Directions").Preload("Creator").Where("chat_id = ?", chatID).First(&club).Error
 	return club, err
 }

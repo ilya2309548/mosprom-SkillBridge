@@ -19,6 +19,34 @@ func NewPostHandler(postService *service.PostService) *PostHandler {
 	}
 }
 
+// JoinPostRequest represents the request body for joining a post
+type JoinPostRequest struct {
+	PostID uint `json:"post_id" binding:"required"`
+	UserID uint `json:"user_id" binding:"required"`
+}
+
+// Join allows a user to join a post (e.g., activity)
+// @Summary User joins a post
+// @Tags posts
+// @Accept json
+// @Produce json
+// @Param input body handler.JoinPostRequest true "Post and User IDs"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Router /posts/join [post]
+func (h *PostHandler) Join(c *gin.Context) {
+	var body JoinPostRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := h.postService.Join(body.UserID, body.PostID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
 // CreatePost creates a new post
 // @Summary Create a new post
 // @Description Create a new post with the provided details
@@ -128,6 +156,52 @@ func (h *PostHandler) GetAllPosts(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, posts)
+}
+
+// JoinedByMe lists posts the current authorized user joined
+// @Summary List my joined posts
+// @Tags posts
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {array} model.Post
+// @Failure 401 {object} map[string]string
+// @Router /me/posts [get]
+func (h *PostHandler) JoinedByMe(c *gin.Context) {
+	uidAny, ok := c.Get("user_id")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	uid := uidAny.(uint)
+	posts, err := h.postService.JoinedPosts(uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, posts)
+}
+
+// JoinedByUser lists posts a given user joined
+// @Summary List posts joined by user
+// @Tags posts
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {array} model.Post
+// @Failure 400 {object} map[string]string
+// @Router /users/{id}/posts [get]
+func (h *PostHandler) JoinedByUser(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+	posts, err := h.postService.JoinedPosts(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, posts)
 }
 

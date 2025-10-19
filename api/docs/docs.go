@@ -624,6 +624,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/me/posts": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "List my joined posts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Post"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/photos/{filename}": {
             "get": {
                 "description": "Returns a photo from uploads/photos by filename (DB stores just filenames)",
@@ -784,6 +820,45 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/join": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "User joins a post",
+                "parameters": [
+                    {
+                        "description": "Post and User IDs",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.JoinPostRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -1132,6 +1207,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/{id}/posts": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "List posts joined by user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Post"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/{id}/technologies": {
             "get": {
                 "produces": [
@@ -1191,6 +1306,21 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "handler.JoinPostRequest": {
+            "type": "object",
+            "required": [
+                "post_id",
+                "user_id"
+            ],
+            "properties": {
+                "post_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1297,12 +1427,6 @@ const docTemplate = `{
                         "$ref": "#/definitions/model.Direction"
                     }
                 },
-                "events": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Event"
-                    }
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -1341,23 +1465,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Event": {
-            "type": "object",
-            "properties": {
-                "club_id": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "model.Post": {
             "type": "object",
             "properties": {
@@ -1386,6 +1493,15 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.PostFormat"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.User"
+                    }
+                },
+                "participants_count": {
                     "type": "integer"
                 },
                 "start_date": {
@@ -1505,6 +1621,13 @@ const docTemplate = `{
                 "photo": {
                     "description": "относительный путь до файла",
                     "type": "string"
+                },
+                "posts": {
+                    "description": "Post participation (e.g., activities, projects, etc.)",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Post"
+                    }
                 },
                 "technologies": {
                     "type": "array",

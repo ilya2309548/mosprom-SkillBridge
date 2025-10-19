@@ -12,6 +12,10 @@ func NewPostService() *PostService {
 	return &PostService{}
 }
 
+func (s *PostService) Join(userID, postID uint) error {
+	return repository.JoinUserToPost(userID, postID)
+}
+
 type CreatePostInput struct {
 	Title          string            `json:"title" binding:"required"`
 	Description    string            `json:"description"`
@@ -118,4 +122,8 @@ func (s *PostService) UpdatePost(input UpdatePostInput) (model.Post, error) {
 
 func (s *PostService) DeletePost(id uint) error {
 	return repository.DeletePost(id)
+}
+
+func (s *PostService) JoinedPosts(userID uint) ([]model.Post, error) {
+	return repository.GetUserJoinedPosts(userID)
 }

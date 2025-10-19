@@ -3,6 +3,8 @@ package repository
 import (
 	"2gis-calm-map/api/internal/db"
 	"2gis-calm-map/api/internal/model"
+
+	"gorm.io/gorm"
 )
 
 func CreatePost(post *model.Post) error {
@@ -33,4 +35,47 @@ func UpdatePost(post *model.Post) error {
 
 func DeletePost(id uint) error {
 	return db.DB.Delete(&model.Post{}, id).Error
+}
+
+// JoinUserToPost adds user to post participants and updates counters atomically
+func JoinUserToPost(userID, postID uint) error {
+	return db.DB.Transaction(func(tx *gorm.DB) error {
+		var post model.Post
+		if err := tx.First(&post, postID).Error; err != nil {
+			return err
+		}
+		var user model.User
+		if err := tx.First(&user, userID).Error; err != nil {
+			return err
+		}
+
+		// check existing
+		var cnt int64
+		if err := tx.Table("post_participants").Where("post_id = ? AND user_id = ?", postID, userID).Count(&cnt).Error; err != nil {
+			return err
+		}
+		if cnt == 0 {
+			if err := tx.Model(&post).Association("Participants").Append(&user); err != nil {
+				return err
+			}
+			if err := tx.Model(&model.Post{}).Where("id = ?", postID).UpdateColumn("participants_count", gorm.Expr("participants_count + 1")).Error; err != nil {
+				return err
+			}
+			if err := tx.Model(&model.User{}).Where("id = ?", userID).UpdateColumn("events_count", gorm.Expr("events_count + 1")).Error; err != nil { // reuse events_count as overall participation counter
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+// GetUserJoinedPosts returns posts that the user participates in
+func GetUserJoinedPosts(userID uint) ([]model.Post, error) {
+	var posts []model.Post
+	err := db.DB.Model(&model.Post{}).
+		Joins("JOIN post_participants pp ON pp.post_id = posts.id").
+		Where("pp.user_id = ?", userID).
+		Preload("Club").
+		Find(&posts).Error
+	return posts, err
 }

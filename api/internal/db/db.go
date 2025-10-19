@@ -22,13 +22,11 @@ func Init(cfg *config.Config) {
 
 	// MIGRATION: порядок важен из-за внешних ключей
 	// 1) Club (родитель)
-	// 2) Event (ссылается на Club)
-	// 3) Direction (имеет FK на Club)
-	// 4) Technology (имеет FK на Direction)
-	// 5) User (создаёт join-таблицы для many2many c Technology/Direction)
+	// 2) Direction (имеет FK на Club)
+	// 3) Technology (имеет FK на Direction)
+	// 4) User (создаёт join-таблицы для many2many c Technology/Direction)
 	if err := DB.AutoMigrate(
 		&model.Club{},
-		&model.Event{},
 		&model.Direction{},
 		&model.Technology{},
 		&model.User{},
@@ -49,4 +47,7 @@ func Init(cfg *config.Config) {
 			ON CONFLICT (direction_id, technology_id) DO NOTHING
 		`).Error
 	}
+
+	// Ensure unique index on post participants join table
+	_ = DB.Exec("CREATE UNIQUE INDEX IF NOT EXISTS ux_post_participants ON post_participants (post_id, user_id)").Error
 }

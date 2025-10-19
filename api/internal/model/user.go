@@ -20,6 +20,8 @@ type User struct {
 	// Subscriptions
 	Clubs      []Club `json:"clubs" gorm:"many2many:club_subscribers;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	ClubsCount int    `json:"clubs_count"`
+	// Post participation (e.g., activities, projects, etc.)
+	Posts []Post `json:"posts" gorm:"many2many:post_participants;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type Technology struct {

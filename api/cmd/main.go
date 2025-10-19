@@ -119,6 +119,9 @@ func main() {
 	r.POST("/posts", postHandler.CreatePost)
 	r.PUT("/posts/:id", postHandler.UpdatePost)
 	r.DELETE("/posts/:id", postHandler.DeletePost)
+	// Join a post
+	r.POST("/posts/join", postHandler.Join)
+	// Post participation (single registration)
 
 	clubAuth := r.Group("/clubs")
 	clubAuth.Use(middleware.JWTAuth())
@@ -138,10 +141,14 @@ func main() {
 		auth.POST("/me/photo", handler.SetMyPhoto)
 		// Current user's subscribed clubs
 		auth.GET("/me/clubs", handler.GetUserClubs)
+		// Current user's joined posts
+		auth.GET("/me/posts", postHandler.JoinedByMe)
 	}
 
 	// Get clubs of a specific user by id
 	r.GET("/users/:id/clubs", handler.GetSubscriberClubs)
+	// Posts joined by a user
+	r.GET("/users/:id/posts", postHandler.JoinedByUser)
 
 	r.GET("/ws", func(c *gin.Context) {
 		websockets.ServeWs(c.Writer, c.Request)
