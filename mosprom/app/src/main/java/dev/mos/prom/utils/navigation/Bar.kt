@@ -25,9 +25,9 @@ sealed class Bar (
         icon = R.drawable.ic_search
     )
 
-    data object CreatePost : Bar(
-        route = Route.CreatePost,
-        title = "Создать пост",
+    data object CreateClub : Bar(
+        route = Route.CreateClub,
+        title = "Создать клуб",
         icon = R.drawable.ic_add
     )
 
@@ -44,6 +44,6 @@ sealed class Bar (
     )
 
     companion object {
-        val items = listOf(Main, Search, CreatePost, Notifications, Profile)
+        val items = listOf(Main, Search, CreateClub, Notifications, Profile)
     }
 }

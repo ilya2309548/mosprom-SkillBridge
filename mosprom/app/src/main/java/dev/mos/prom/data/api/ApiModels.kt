@@ -72,3 +72,20 @@ data class PostUserTechnologiesRequest(
     @SerialName("user_id") val userId: Long,
     val technologies: List<String>,
 )
+
+@Serializable
+data class CreatePostApiRequest(
+    val title: String,
+    val description: String = "",
+    val type: String,
+    @SerialName("end_date") val endDate: String? = null, // ISO8601 or RFC3339
+    @SerialName("age_restriction") val ageRestriction: Int? = null,
+    val format: String? = null,
+    val address: String = "",
+    @SerialName("club_id") val clubId: Long,
+)
+
+@Serializable
+data class PostDto(
+    val id: Long,
+)

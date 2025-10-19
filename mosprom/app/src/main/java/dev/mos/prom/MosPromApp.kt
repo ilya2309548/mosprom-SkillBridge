@@ -89,6 +89,19 @@ fun MosPromApp() {
                 composable<Route.CreatePost>(
                     exitTransition = { slideOutHorizontally() },
                     popEnterTransition = { slideInHorizontally() }
+                ) { backStackEntry ->
+                    val args = backStackEntry.toRoute<Route.CreatePost>()
+                    dev.mos.prom.presentation.post.ui.CreatePostScreen(
+                        innerPadding = innerPadding,
+                        navController = navController,
+                        clubId = args.clubId,
+                        clubName = args.clubName
+                    )
+                }
+
+                composable<Route.CreateClub>(
+                    exitTransition = { slideOutHorizontally() },
+                    popEnterTransition = { slideInHorizontally() }
                 ) {
                     ClubCreateScreen(
                         innerPadding = innerPadding,

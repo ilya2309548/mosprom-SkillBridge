@@ -18,7 +18,7 @@ sealed interface Route {
     data object Search : Route
 
     @Serializable
-    data object CreatePost : Route
+    data object CreateClub : Route
 
     @Serializable
     data object Notifications : Route
@@ -49,6 +49,12 @@ sealed interface Route {
     data class ClubChat(
         val id: Long,
         val name: String
+    ) : Route
+
+    @Serializable
+    data class CreatePost(
+        val clubId: Long,
+        val clubName: String? = null,
     ) : Route
 
 }

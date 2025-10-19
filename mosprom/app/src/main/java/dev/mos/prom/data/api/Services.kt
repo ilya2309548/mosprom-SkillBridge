@@ -152,3 +152,11 @@ class ChatService(private val client: HttpClient) {
         ) { block() }
     }
 }
+
+class PostService(private val client: HttpClient) {
+    suspend fun createPost(req: CreatePostApiRequest): PostDto =
+        client.post("/posts") {
+            contentType(ContentType.Application.Json)
+            setBody(req)
+        }.body()
+}

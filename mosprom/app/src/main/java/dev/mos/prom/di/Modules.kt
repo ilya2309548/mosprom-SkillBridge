@@ -5,6 +5,7 @@ import dev.mos.prom.data.api.KtorClientProvider
 import dev.mos.prom.data.api.ProfileService
 import dev.mos.prom.data.api.ClubService
 import dev.mos.prom.data.api.ChatService
+import dev.mos.prom.data.api.PostService
 import dev.mos.prom.data.repo.AuthRepository
 import dev.mos.prom.data.repo.ProfileRepository
 import dev.mos.prom.data.repo.ClubRepository
@@ -36,6 +37,7 @@ val modules = module {
     single { ProfileService(get()) }
     single { ClubService(get()) }
     single { ChatService(get()) }
+    single { PostService(get()) }
 
     // JSON
     single {
