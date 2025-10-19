@@ -13,19 +13,19 @@ func CreatePost(post *model.Post) error {
 
 func GetPostByID(id uint) (model.Post, error) {
 	var post model.Post
-	err := db.DB.Preload("Club").Preload("Likes").Preload("Technologies").First(&post, id).Error
+	err := db.DB.Preload("Club").Preload("Likes").Preload("Technologies").Preload("Participants").First(&post, id).Error
 	return post, err
 }
 
 func GetPostsByClubID(clubID uint) ([]model.Post, error) {
 	var posts []model.Post
-	err := db.DB.Where("club_id = ?", clubID).Preload("Club").Preload("Likes").Preload("Technologies").Find(&posts).Error
+	err := db.DB.Where("club_id = ?", clubID).Preload("Club").Preload("Likes").Preload("Technologies").Preload("Participants").Find(&posts).Error
 	return posts, err
 }
 
 func GetAllPosts() ([]model.Post, error) {
 	var posts []model.Post
-	err := db.DB.Preload("Club").Preload("Likes").Preload("Technologies").Find(&posts).Error
+	err := db.DB.Preload("Club").Preload("Likes").Preload("Technologies").Preload("Participants").Find(&posts).Error
 	return posts, err
 }
 
@@ -39,7 +39,7 @@ func DeletePost(id uint) error {
 
 func GetPostWithDetails(id uint) (model.Post, error) {
 	var post model.Post
-	err := db.DB.Preload("Club").Preload("Likes.User").Preload("Technologies").First(&post, id).Error
+	err := db.DB.Preload("Club").Preload("Likes.User").Preload("Technologies").Preload("Participants").First(&post, id).Error
 	return post, err
 }
 
@@ -80,7 +80,7 @@ func GetUserJoinedPosts(userID uint) ([]model.Post, error) {
 	err := db.DB.Model(&model.Post{}).
 		Joins("JOIN post_participants pp ON pp.post_id = posts.id").
 		Where("pp.user_id = ?", userID).
-		Preload("Club").Preload("Technologies").
+		Preload("Club").Preload("Technologies").Preload("Participants").
 		Find(&posts).Error
 	return posts, err
 }

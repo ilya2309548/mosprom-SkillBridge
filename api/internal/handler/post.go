@@ -49,7 +49,7 @@ type JoinPostRequest struct {
 // @Accept json
 // @Produce json
 // @Param input body handler.JoinPostRequest true "Post and User IDs"
-// @Success 204
+// @Success 200 {object} model.Post
 // @Failure 400 {object} map[string]string
 // @Router /posts/join [post]
 // @Security BearerAuth
@@ -59,11 +59,12 @@ func (h *PostHandler) Join(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := h.postService.Join(body.UserID, body.PostID); err != nil {
+	post, err := h.postService.Join(body.UserID, body.PostID)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, post)
 }
 
 // CreatePost creates a new post

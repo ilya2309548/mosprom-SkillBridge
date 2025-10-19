@@ -15,8 +15,12 @@ func NewPostService() *PostService {
 	return &PostService{}
 }
 
-func (s *PostService) Join(userID, postID uint) error {
-	return repository.JoinUserToPost(userID, postID)
+func (s *PostService) Join(userID, postID uint) (model.Post, error) {
+	if err := repository.JoinUserToPost(userID, postID); err != nil {
+		return model.Post{}, err
+	}
+	// Return the updated post with participants
+	return repository.GetPostByID(postID)
 }
 
 type CreatePostInput struct {
