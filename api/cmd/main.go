@@ -116,6 +116,7 @@ func main() {
 	r.GET("/posts", postHandler.GetAllPosts)
 	r.GET("/posts/:id", postHandler.GetPostByID)
 	r.GET("/posts/club", postHandler.GetPostsByClubID)
+	r.POST("/posts/join", postHandler.Join)
 	r.POST("/posts", postHandler.CreatePost)
 
 	// Secured post routes
@@ -125,7 +126,10 @@ func main() {
 		postAuth.PUT("/:id", postHandler.UpdatePost)
 		postAuth.DELETE("/:id", postHandler.DeletePost)
 
-		postAuth.POST("/join", postHandler.Join)
+		// join remains public above to avoid auth requirement
+		// Post technologies (secured: both GET and POST require JWT)
+		postAuth.GET("/:id/technologies", postHandler.GetTechnologies)
+		postAuth.POST("/:id/technologies", postHandler.SetTechnologies)
 		// Post likes
 		postAuth.POST("/:id/like", postHandler.LikePost)
 		postAuth.POST("/:id/unlike", postHandler.UnlikePost)

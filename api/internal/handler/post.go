@@ -302,6 +302,67 @@ func (h *PostHandler) DeletePost(c *gin.Context) {
 }
 
 // LikePost adds a like to a post
+
+// PostTechnologiesRequest represents input for setting technologies of a post
+type PostTechnologiesRequest struct {
+	Technologies []string `json:"technologies" binding:"required"`
+}
+
+// SetTechnologies replaces technologies for a post by ID
+// @Summary Set technologies for a post
+// @Tags posts
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path int true "Post ID"
+// @Param input body handler.PostTechnologiesRequest true "Technologies"
+// @Success 200 {array} model.Technology
+// @Failure 400 {object} map[string]string
+// @Router /posts/{id}/technologies [post]
+func (h *PostHandler) SetTechnologies(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		return
+	}
+	var body PostTechnologiesRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	techs, err := h.postService.SetPostTechnologies(uint(id), body.Technologies)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, techs)
+}
+
+// GetTechnologies returns technologies for a post by ID
+// @Summary Get technologies for a post
+// @Tags posts
+// @Security BearerAuth
+// @Produce json
+// @Param id path int true "Post ID"
+// @Success 200 {array} model.Technology
+// @Failure 400 {object} map[string]string
+// @Router /posts/{id}/technologies [get]
+func (h *PostHandler) GetTechnologies(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		return
+	}
+	techs, err := h.postService.TechnologiesByPostID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, techs)
+}
+
 // @Summary Like a post
 // @Description Add a like to a post by the current user
 // @Tags posts

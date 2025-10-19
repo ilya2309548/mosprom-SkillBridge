@@ -128,6 +128,22 @@ func (s *PostService) JoinedPosts(userID uint) ([]model.Post, error) {
 	return repository.GetUserJoinedPosts(userID)
 }
 
+// SetPostTechnologies replaces technologies for a post, creating any missing by name
+func (s *PostService) SetPostTechnologies(postID uint, techNames []string) ([]model.Technology, error) {
+	techs, err := repository.FindOrCreateTechnologiesByNames(techNames)
+	if err != nil {
+		return nil, err
+	}
+	if err := repository.ReplacePostTechnologies(postID, techs); err != nil {
+		return nil, err
+	}
+	return techs, nil
+}
+
+func (s *PostService) TechnologiesByPostID(postID uint) ([]model.Technology, error) {
+	return repository.GetTechnologiesByPostID(postID)
+}
+
 func (s *PostService) LikePost(postID, userID uint) error {
 	_, err := repository.GetLikeByUserAndPost(userID, postID)
 	if err == nil {

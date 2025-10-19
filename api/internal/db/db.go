@@ -51,4 +51,7 @@ func Init(cfg *config.Config) {
 
 	// Ensure unique index on post participants join table
 	_ = DB.Exec("CREATE UNIQUE INDEX IF NOT EXISTS ux_post_participants ON post_participants (post_id, user_id)").Error
+
+	// Ensure unique index on post technologies join table
+	_ = DB.Exec("CREATE UNIQUE INDEX IF NOT EXISTS ux_post_technologies ON post_technologies (post_id, technology_id)").Error
 }

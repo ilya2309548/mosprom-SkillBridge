@@ -13,19 +13,19 @@ func CreatePost(post *model.Post) error {
 
 func GetPostByID(id uint) (model.Post, error) {
 	var post model.Post
-	err := db.DB.Preload("Club").Preload("Likes").First(&post, id).Error
+	err := db.DB.Preload("Club").Preload("Likes").Preload("Technologies").First(&post, id).Error
 	return post, err
 }
 
 func GetPostsByClubID(clubID uint) ([]model.Post, error) {
 	var posts []model.Post
-	err := db.DB.Where("club_id = ?", clubID).Preload("Club").Preload("Likes").Find(&posts).Error
+	err := db.DB.Where("club_id = ?", clubID).Preload("Club").Preload("Likes").Preload("Technologies").Find(&posts).Error
 	return posts, err
 }
 
 func GetAllPosts() ([]model.Post, error) {
 	var posts []model.Post
-	err := db.DB.Preload("Club").Preload("Likes").Find(&posts).Error
+	err := db.DB.Preload("Club").Preload("Likes").Preload("Technologies").Find(&posts).Error
 	return posts, err
 }
 
@@ -39,7 +39,7 @@ func DeletePost(id uint) error {
 
 func GetPostWithDetails(id uint) (model.Post, error) {
 	var post model.Post
-	err := db.DB.Preload("Club").Preload("Likes.User").First(&post, id).Error
+	err := db.DB.Preload("Club").Preload("Likes.User").Preload("Technologies").First(&post, id).Error
 	return post, err
 }
 
@@ -81,7 +81,26 @@ func GetUserJoinedPosts(userID uint) ([]model.Post, error) {
 	err := db.DB.Model(&model.Post{}).
 		Joins("JOIN post_participants pp ON pp.post_id = posts.id").
 		Where("pp.user_id = ?", userID).
-		Preload("Club").
+		Preload("Club").Preload("Technologies").
 		Find(&posts).Error
 	return posts, err
+}
+
+// ReplacePostTechnologies sets technologies for a post using technology names
+func ReplacePostTechnologies(postID uint, techs []model.Technology) error {
+	var post model.Post
+	if err := db.DB.First(&post, postID).Error; err != nil {
+		return err
+	}
+	return db.DB.Model(&post).Association("Technologies").Replace(&techs)
+}
+
+// GetTechnologiesByPostID returns technologies linked to a given post
+func GetTechnologiesByPostID(postID uint) ([]model.Technology, error) {
+	var techs []model.Technology
+	err := db.DB.Model(&model.Technology{}).
+		Joins("JOIN post_technologies pt ON pt.technology_id = technologies.id").
+		Where("pt.post_id = ?", postID).
+		Find(&techs).Error
+	return techs, err
 }
