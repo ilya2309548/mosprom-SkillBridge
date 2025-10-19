@@ -1,9 +1,9 @@
 package service
 
 import (
-	"2gis-calm-map/api/internal/model"
-	"2gis-calm-map/api/internal/repository"
 	"fmt"
+	"mosprom/api/internal/model"
+	"mosprom/api/internal/repository"
 )
 
 type UserService struct{}

@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"2gis-calm-map/api/internal/db"
-	"2gis-calm-map/api/internal/model"
+	"mosprom/api/internal/db"
+	"mosprom/api/internal/model"
 )
 
 func CreateLike(like *model.Like) error {

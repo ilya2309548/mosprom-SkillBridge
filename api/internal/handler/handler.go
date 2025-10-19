@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"2gis-calm-map/api/internal/service"
 	"io"
 	"mime/multipart"
+	"mosprom/api/internal/service"
 	"net/http"
 	"os"
 	"path/filepath"

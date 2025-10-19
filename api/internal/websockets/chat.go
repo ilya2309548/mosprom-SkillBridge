@@ -1,10 +1,10 @@
 package websockets
 
 import (
-	"2gis-calm-map/api/internal/service"
 	"context"
 	"encoding/json"
 	"log"
+	"mosprom/api/internal/service"
 	"net/http"
 	"strconv"
 	"sync"

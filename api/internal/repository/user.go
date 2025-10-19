@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"2gis-calm-map/api/internal/db"
-	"2gis-calm-map/api/internal/model"
 	"errors"
+	"mosprom/api/internal/db"
+	"mosprom/api/internal/model"
 
 	"gorm.io/gorm"
 )

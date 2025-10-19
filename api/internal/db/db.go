@@ -1,9 +1,9 @@
 package db
 
 import (
-	"2gis-calm-map/api/config"
-	"2gis-calm-map/api/internal/model"
 	"log"
+	"mosprom/api/config"
+	"mosprom/api/internal/model"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

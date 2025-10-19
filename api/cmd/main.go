@@ -6,18 +6,18 @@ import (
 	"net/http"
 	"strings"
 
-	"2gis-calm-map/api/config"
-	docs "2gis-calm-map/api/docs"
+	"mosprom/api/config"
+	docs "mosprom/api/docs"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"2gis-calm-map/api/internal/db"
-	"2gis-calm-map/api/internal/handler"
-	"2gis-calm-map/api/internal/middleware"
-	"2gis-calm-map/api/internal/service"
-	"2gis-calm-map/api/internal/websockets"
+	"mosprom/api/internal/db"
+	"mosprom/api/internal/handler"
+	"mosprom/api/internal/middleware"
+	"mosprom/api/internal/service"
+	"mosprom/api/internal/websockets"
 )
 
 // @title Mosprom API

@@ -1,4 +1,4 @@
-module 2gis-calm-map/api
+module mosprom/api
 
 go 1.25.1
 

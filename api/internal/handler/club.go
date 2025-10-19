@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"2gis-calm-map/api/internal/middleware"
-	"2gis-calm-map/api/internal/model"
-	"2gis-calm-map/api/internal/service"
+	"mosprom/api/internal/middleware"
+	"mosprom/api/internal/model"
+	"mosprom/api/internal/service"
 	"net/http"
 	"strconv"
 	"strings"

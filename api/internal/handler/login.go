@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"2gis-calm-map/api/internal/service"
+	"mosprom/api/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
