@@ -19,6 +19,24 @@ func NewPostHandler(postService *service.PostService) *PostHandler {
 	}
 }
 
+func isValidPostType(postType model.PostType) bool {
+	switch postType {
+	case model.InfoPost, model.Project, model.Internship, model.Educational, model.Activity, model.Vacancy:
+		return true
+	default:
+		return false
+	}
+}
+
+func isValidPostFormat(postFormat model.PostFormat) bool {
+	switch postFormat {
+	case model.InPerson, model.Online:
+		return true
+	default:
+		return false
+	}
+}
+
 // JoinPostRequest represents the request body for joining a post
 type JoinPostRequest struct {
 	PostID uint `json:"post_id" binding:"required"`
@@ -34,6 +52,7 @@ type JoinPostRequest struct {
 // @Success 204
 // @Failure 400 {object} map[string]string
 // @Router /posts/join [post]
+// @Security BearerAuth
 func (h *PostHandler) Join(c *gin.Context) {
 	var body JoinPostRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -218,6 +237,7 @@ func (h *PostHandler) JoinedByUser(c *gin.Context) {
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /posts/{id} [put]
+// @Security BearerAuth
 func (h *PostHandler) UpdatePost(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -259,11 +279,12 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 // @Tags posts
 // @Produce json
 // @Param id path int true "Post ID"
-// @Success 200 {object} map[string]string
+// @Success 204
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /posts/{id} [delete]
+// @Security BearerAuth
 func (h *PostHandler) DeletePost(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
@@ -277,27 +298,93 @@ func (h *PostHandler) DeletePost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Post deleted successfully"})
+	c.Status(http.StatusNoContent)
 }
 
-func isValidPostType(postType model.PostType) bool {
-	validTypes := []model.PostType{
-		model.InfoPost,
-		model.Project,
-		model.Internship,
-		model.Educational,
-		model.Activity,
-		model.Vacancy,
+// LikePost adds a like to a post
+// @Summary Like a post
+// @Description Add a like to a post by the current user
+// @Tags posts
+// @Produce json
+// @Param id path int true "Post ID"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /posts/{id}/like [post]
+// @Security BearerAuth
+func (h *PostHandler) LikePost(c *gin.Context) {
+	// Get post ID from URL parameter
+	postIDParam := c.Param("id")
+	postID, err := strconv.Atoi(postIDParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		return
 	}
 
-	for _, validType := range validTypes {
-		if postType == validType {
-			return true
-		}
+	// Get user ID from context (assuming it's set by authentication middleware)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
 	}
-	return false
+
+	// Convert userID to uint
+	userIDUint, ok := userID.(uint)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+
+	// Add like to post
+	if err := h.postService.LikePost(uint(postID), userIDUint); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Post liked successfully"})
 }
 
-func isValidPostFormat(postFormat model.PostFormat) bool {
-	return postFormat == model.InPerson || postFormat == model.Online
+// UnlikePost removes a like from a post
+// @Summary Unlike a post
+// @Description Remove a like from a post by the current user
+// @Tags posts
+// @Produce json
+// @Param id path int true "Post ID"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /posts/{id}/unlike [post]
+// @Security BearerAuth
+func (h *PostHandler) UnlikePost(c *gin.Context) {
+	// Get post ID from URL parameter
+	postIDParam := c.Param("id")
+	postID, err := strconv.Atoi(postIDParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		return
+	}
+
+	// Get user ID from context (assuming it's set by authentication middleware)
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	// Convert userID to uint
+	userIDUint, ok := userID.(uint)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+
+	// Remove like from post
+	if err := h.postService.UnlikePost(uint(postID), userIDUint); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Post unliked successfully"})
 }

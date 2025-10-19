@@ -13,19 +13,19 @@ func CreatePost(post *model.Post) error {
 
 func GetPostByID(id uint) (model.Post, error) {
 	var post model.Post
-	err := db.DB.Preload("Club").First(&post, id).Error
+	err := db.DB.Preload("Club").Preload("Likes").First(&post, id).Error
 	return post, err
 }
 
 func GetPostsByClubID(clubID uint) ([]model.Post, error) {
 	var posts []model.Post
-	err := db.DB.Where("club_id = ?", clubID).Preload("Club").Find(&posts).Error
+	err := db.DB.Where("club_id = ?", clubID).Preload("Club").Preload("Likes").Find(&posts).Error
 	return posts, err
 }
 
 func GetAllPosts() ([]model.Post, error) {
 	var posts []model.Post
-	err := db.DB.Preload("Club").Find(&posts).Error
+	err := db.DB.Preload("Club").Preload("Likes").Find(&posts).Error
 	return posts, err
 }
 
@@ -35,6 +35,12 @@ func UpdatePost(post *model.Post) error {
 
 func DeletePost(id uint) error {
 	return db.DB.Delete(&model.Post{}, id).Error
+}
+
+func GetPostWithDetails(id uint) (model.Post, error) {
+	var post model.Post
+	err := db.DB.Preload("Club").Preload("Likes.User").First(&post, id).Error
+	return post, err
 }
 
 // JoinUserToPost adds user to post participants and updates counters atomically

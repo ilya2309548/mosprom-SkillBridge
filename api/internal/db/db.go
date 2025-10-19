@@ -31,6 +31,7 @@ func Init(cfg *config.Config) {
 		&model.Technology{},
 		&model.User{},
 		&model.Post{},
+		&model.Like{},
 	); err != nil {
 		log.Fatal("failed to migrate database: ", err)
 	}

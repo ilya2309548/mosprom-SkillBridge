@@ -36,6 +36,7 @@ type Post struct {
 	Club              *Club       `json:"club" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Participants      []User      `json:"participants" gorm:"many2many:post_participants;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	ParticipantsCount int         `json:"participants_count"`
+	Likes             []Like      `json:"likes" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	CreatedAt         time.Time   `json:"created_at"`
 	UpdatedAt         time.Time   `json:"updated_at"`
 }

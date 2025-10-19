@@ -22,6 +22,7 @@ type User struct {
 	ClubsCount int    `json:"clubs_count"`
 	// Post participation (e.g., activities, projects, etc.)
 	Posts []Post `json:"posts" gorm:"many2many:post_participants;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Likes []Like `json:"likes" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type Technology struct {

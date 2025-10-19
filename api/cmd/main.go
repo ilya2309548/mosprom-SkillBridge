@@ -117,11 +117,19 @@ func main() {
 	r.GET("/posts/:id", postHandler.GetPostByID)
 	r.GET("/posts/club", postHandler.GetPostsByClubID)
 	r.POST("/posts", postHandler.CreatePost)
-	r.PUT("/posts/:id", postHandler.UpdatePost)
-	r.DELETE("/posts/:id", postHandler.DeletePost)
-	// Join a post
-	r.POST("/posts/join", postHandler.Join)
-	// Post participation (single registration)
+
+	// Secured post routes
+	postAuth := r.Group("/posts")
+	postAuth.Use(middleware.JWTAuth())
+	{
+		postAuth.PUT("/:id", postHandler.UpdatePost)
+		postAuth.DELETE("/:id", postHandler.DeletePost)
+
+		postAuth.POST("/join", postHandler.Join)
+		// Post likes
+		postAuth.POST("/:id/like", postHandler.LikePost)
+		postAuth.POST("/:id/unlike", postHandler.UnlikePost)
+	}
 
 	clubAuth := r.Group("/clubs")
 	clubAuth.Use(middleware.JWTAuth())

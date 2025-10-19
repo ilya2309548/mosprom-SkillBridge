@@ -127,3 +127,24 @@ func (s *PostService) DeletePost(id uint) error {
 func (s *PostService) JoinedPosts(userID uint) ([]model.Post, error) {
 	return repository.GetUserJoinedPosts(userID)
 }
+
+func (s *PostService) LikePost(postID, userID uint) error {
+	_, err := repository.GetLikeByUserAndPost(userID, postID)
+	if err == nil {
+		return nil
+	}
+	if err != nil && err.Error() != "record not found" {
+		return err
+	}
+
+	like := model.Like{
+		PostID: postID,
+		UserID: userID,
+	}
+
+	return repository.CreateLike(&like)
+}
+
+func (s *PostService) UnlikePost(postID, userID uint) error {
+	return repository.DeleteLike(userID, postID)
+}
