@@ -16,6 +16,7 @@ import (
 	"2gis-calm-map/api/internal/db"
 	"2gis-calm-map/api/internal/handler"
 	"2gis-calm-map/api/internal/middleware"
+	"2gis-calm-map/api/internal/service"
 	"2gis-calm-map/api/internal/websockets"
 )
 
@@ -40,6 +41,10 @@ func main() {
 		}
 	}()
 	db.Init(cfg)
+
+	// Initialize services
+	postService := service.NewPostService()
+	postHandler := handler.NewPostHandler(postService)
 
 	r := gin.Default()
 
@@ -106,6 +111,14 @@ func main() {
 	// Directions
 	r.GET("/directions", handler.ListDirections)
 	r.GET("/directions/:id/technologies", handler.GetTechnologiesByDirection)
+
+	// Posts
+	r.GET("/posts", postHandler.GetAllPosts)
+	r.GET("/posts/:id", postHandler.GetPostByID)
+	r.GET("/posts/club", postHandler.GetPostsByClubID)
+	r.POST("/posts", postHandler.CreatePost)
+	r.PUT("/posts/:id", postHandler.UpdatePost)
+	r.DELETE("/posts/:id", postHandler.DeletePost)
 
 	clubAuth := r.Group("/clubs")
 	clubAuth.Use(middleware.JWTAuth())

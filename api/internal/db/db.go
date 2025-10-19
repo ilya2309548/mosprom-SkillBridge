@@ -32,6 +32,7 @@ func Init(cfg *config.Config) {
 		&model.Direction{},
 		&model.Technology{},
 		&model.User{},
+		&model.Post{},
 	); err != nil {
 		log.Fatal("failed to migrate database: ", err)
 	}
