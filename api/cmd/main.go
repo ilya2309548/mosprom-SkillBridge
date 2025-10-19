@@ -161,6 +161,7 @@ func main() {
 		auth.GET("/me/clubs", handler.GetUserClubs)
 		// Current user's joined posts
 		auth.GET("/me/posts", postHandler.JoinedByMe)
+		auth.GET("/me/posts/recommended", postHandler.RecommendedPostsForMe)
 		// Current user's achievements
 		auth.GET("/me/achievements", handler.GetMyAchievements)
 	}

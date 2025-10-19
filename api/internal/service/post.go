@@ -171,3 +171,31 @@ func (s *PostService) UnlikePost(postID, userID uint) error {
 func (s *PostService) GetPostParticipants(postID uint) ([]model.User, error) {
 	return repository.GetPostParticipants(postID)
 }
+
+type RecommendedPost struct {
+	Post      model.Post `json:"post"`
+	TechMatch float64    `json:"tech_match"`
+}
+
+// RecommendedForUser returns posts sorted by technology match with the user
+func (s *PostService) RecommendedForUser(userID uint) ([]RecommendedPost, error) {
+	rows, err := repository.GetPostTechMatchRanking(userID)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]uint, 0, len(rows))
+	for _, r := range rows {
+		ids = append(ids, r.PostID)
+	}
+	m, err := repository.GetPostsByIDs(ids)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]RecommendedPost, 0, len(rows))
+	for _, r := range rows {
+		if p, ok := m[r.PostID]; ok {
+			out = append(out, RecommendedPost{Post: p, TechMatch: r.TechMatch})
+		}
+	}
+	return out, nil
+}

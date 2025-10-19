@@ -706,6 +706,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/me/posts/recommended": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns posts sorted by TechMatch = |UserTech ∩ EventTech| / |EventTech|",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Recommended posts for me (by technologies)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/service.RecommendedPost"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/photos/{filename}": {
             "get": {
                 "description": "Returns a photo from uploads/photos by filename (DB stores just filenames)",
@@ -2239,6 +2276,17 @@ const docTemplate = `{
                 },
                 "type": {
                     "$ref": "#/definitions/model.PostType"
+                }
+            }
+        },
+        "service.RecommendedPost": {
+            "type": "object",
+            "properties": {
+                "post": {
+                    "$ref": "#/definitions/model.Post"
+                },
+                "tech_match": {
+                    "type": "number"
                 }
             }
         },

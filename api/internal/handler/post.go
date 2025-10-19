@@ -481,3 +481,27 @@ func (h *PostHandler) GetPostParticipants(c *gin.Context) {
 
 	c.JSON(http.StatusOK, users)
 }
+
+// RecommendedPostsForMe returns posts sorted by technology match with current user
+// @Summary Recommended posts for me (by technologies)
+// @Description Returns posts sorted by TechMatch = |UserTech ∩ EventTech| / |EventTech|
+// @Tags posts
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {array} service.RecommendedPost
+// @Failure 401 {object} map[string]string
+// @Router /me/posts/recommended [get]
+func (h *PostHandler) RecommendedPostsForMe(c *gin.Context) {
+	uidAny, ok := c.Get("user_id")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	uid := uidAny.(uint)
+	res, err := h.postService.RecommendedForUser(uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}

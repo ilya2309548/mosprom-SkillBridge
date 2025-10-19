@@ -110,3 +110,57 @@ func GetPostParticipants(postID uint) ([]model.User, error) {
 		Find(&users).Error
 	return users, err
 }
+
+// TechMatchRow holds post id and its computed tech match score for a user
+type TechMatchRow struct {
+	PostID    uint    `gorm:"column:post_id"`
+	TechMatch float64 `gorm:"column:tech_match"`
+}
+
+// GetPostTechMatchRanking computes |UserTech ∩ EventTech| / |EventTech| for each post and returns sorted list
+func GetPostTechMatchRanking(userID uint) ([]TechMatchRow, error) {
+	var rows []TechMatchRow
+	// Raw SQL for efficiency
+	q := `
+		SELECT p.id AS post_id,
+			   COALESCE(common.cnt::float / NULLIF(pt.cnt, 0), 0) AS tech_match
+		FROM posts p
+		LEFT JOIN (
+			SELECT post_id, COUNT(*) AS cnt
+			FROM post_technologies
+			GROUP BY post_id
+		) pt ON pt.post_id = p.id
+		LEFT JOIN (
+			SELECT pt.post_id, COUNT(*) AS cnt
+			FROM post_technologies pt
+			JOIN user_technologies ut ON ut.technology_id = pt.technology_id
+			WHERE ut.user_id = ?
+			GROUP BY pt.post_id
+		) common ON common.post_id = p.id
+		ORDER BY tech_match DESC, p.id ASC`
+	if err := db.DB.Raw(q, userID).Scan(&rows).Error; err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+// GetPostsByIDs fetches posts by ids with preloads and returns map[id]post for quick assembly
+func GetPostsByIDs(ids []uint) (map[uint]model.Post, error) {
+	if len(ids) == 0 {
+		return map[uint]model.Post{}, nil
+	}
+	var posts []model.Post
+	if err := db.DB.
+		Where("id IN ?", ids).
+		Preload("Club").
+		Preload("Likes").
+		Preload("Technologies").
+		Find(&posts).Error; err != nil {
+		return nil, err
+	}
+	m := make(map[uint]model.Post, len(posts))
+	for _, p := range posts {
+		m[p.ID] = p
+	}
+	return m, nil
+}
