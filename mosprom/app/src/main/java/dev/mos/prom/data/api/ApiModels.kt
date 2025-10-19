@@ -83,6 +83,7 @@ data class CreatePostApiRequest(
     val format: String? = null,
     val address: String = "",
     @SerialName("club_id") val clubId: Long,
+    val technologies: List<String> = emptyList(),
 )
 
 @Serializable

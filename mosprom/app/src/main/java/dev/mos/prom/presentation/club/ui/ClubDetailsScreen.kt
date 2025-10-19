@@ -130,14 +130,12 @@ fun ClubDetailsScreen(
                     }
 
 
-                    if (isCreator) {
-                        Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(12.dp))
 
-                        Button(
-                            onClick = { navController.navigate(dev.mos.prom.utils.navigation.Route.CreatePost(clubId = id, clubName = clubName)) },
-                        ) {
-                            Text("Добавить пост", style = MaterialTheme.typography.labelLarge)
-                        }
+                    Button(
+                        onClick = { navController.navigate(dev.mos.prom.utils.navigation.Route.CreatePost(clubId = id, clubName = clubName)) },
+                    ) {
+                        Text("Добавить пост", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
