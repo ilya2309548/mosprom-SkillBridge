@@ -3,6 +3,8 @@ package service
 import (
 	"2gis-calm-map/api/internal/model"
 	"2gis-calm-map/api/internal/repository"
+
+	"github.com/google/uuid"
 )
 
 type ClubService struct{}
@@ -21,11 +23,15 @@ func (s *ClubService) CreateClub(input CreateClubInput, creatorID uint) (model.C
 	if err != nil {
 		return model.Club{}, err
 	}
+
+	chatID := uuid.New()
+
 	club := model.Club{
 		Name:        input.Name,
 		Description: input.Description,
 		CreatorID:   creatorID,
 		Directions:  dirs,
+		ChatID:      chatID.String(),
 	}
 	if err := repository.CreateClub(&club); err != nil {
 		return model.Club{}, err
@@ -67,4 +73,8 @@ func (s *ClubService) Subscribers(clubID uint) ([]model.User, error) {
 
 func (s *ClubService) ClubsOfUser(userID uint) ([]model.Club, error) {
 	return repository.GetUserClubs(userID)
+}
+
+func (s *ClubService) GetByChatID(chatID string) (model.Club, error) {
+	return repository.GetClubByChatID(chatID)
 }

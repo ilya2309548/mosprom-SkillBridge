@@ -130,3 +130,10 @@ func GetUserClubs(userID uint) ([]model.Club, error) {
 		Find(&clubs).Error
 	return clubs, err
 }
+
+// GetClubByChatID returns a club by its chat ID
+func GetClubByChatID(chatID string) (model.Club, error) {
+	var club model.Club
+	err := db.DB.Preload("Directions").Preload("Events").Preload("Creator").Where("chat_id = ?", chatID).First(&club).Error
+	return club, err
+}

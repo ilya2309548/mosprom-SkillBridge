@@ -292,6 +292,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/clubs/{name}/chat": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clubs"
+                ],
+                "summary": "Get club chat ID by club name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Club name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/directions": {
             "get": {
                 "produces": [
@@ -928,6 +968,9 @@ const docTemplate = `{
         "model.Club": {
             "type": "object",
             "properties": {
+                "chat_id": {
+                    "type": "string"
+                },
                 "creator": {
                     "$ref": "#/definitions/model.User"
                 },

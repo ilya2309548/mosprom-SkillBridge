@@ -12,6 +12,7 @@ type Club struct {
 	Events           []Event     `json:"events"`
 	Subscribers      []User      `json:"subscribers" gorm:"many2many:club_subscribers;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	SubscribersCount int         `json:"subscribers_count"`
+	ChatID           string      `json:"chat_id"`
 }
 
 // Event is a simple event entity belonging to a club

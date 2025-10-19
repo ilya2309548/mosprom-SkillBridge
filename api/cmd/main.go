@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"2gis-calm-map/api/internal/db"
 	"2gis-calm-map/api/internal/handler"
 	"2gis-calm-map/api/internal/middleware"
+	"2gis-calm-map/api/internal/websockets"
 )
 
 // @title 2gis-calm-map API
@@ -27,6 +29,16 @@ import (
 // @name Authorization
 func main() {
 	cfg := config.LoadConfig()
+
+	// Start websocket server in a separate goroutine
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	go func() {
+		if err := websockets.Run(ctx); err != nil {
+			log.Printf("Websocket server error: %v", err)
+		}
+	}()
 	db.Init(cfg)
 
 	r := gin.Default()
@@ -87,6 +99,7 @@ func main() {
 	// Clubs
 	r.GET("/clubs", handler.ListClubs)
 	r.GET("/clubs/:name", handler.GetClubByName)
+	r.GET("/clubs/:name/chat", handler.GetClubChatID)
 	// Subscribers of a club (avoid conflict with /clubs/:name)
 	r.GET("/clubs/id/:id/subscribers", handler.GetClubSubscribers)
 
@@ -116,6 +129,10 @@ func main() {
 
 	// Get clubs of a specific user by id
 	r.GET("/users/:id/clubs", handler.GetSubscriberClubs)
+
+	r.GET("/ws", func(c *gin.Context) {
+		websockets.ServeWs(c.Writer, c.Request)
+	})
 
 	log.Println("start at :8080")
 	if err := r.Run(":8080"); err != nil {

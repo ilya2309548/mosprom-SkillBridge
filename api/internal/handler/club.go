@@ -111,6 +111,25 @@ func GetClubByName(c *gin.Context) {
 	c.JSON(http.StatusOK, club)
 }
 
+// GetClubChatID godoc
+// @Summary Get club chat ID by club name
+// @Tags clubs
+// @Produce json
+// @Param name path string true "Club name"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /clubs/{name}/chat [get]
+func GetClubChatID(c *gin.Context) {
+	name := c.Param("name")
+	name = strings.TrimSpace(name)
+	club, err := clubService.GetByName(name)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"chat_id": club.ChatID})
+}
+
 // ListClubs godoc
 // @Summary List clubs with optional name and directions filters
 // @Description If name is provided, filter by exact club name. If directions provided (comma-separated), return clubs that have ALL these directions. If omitted, no filter by that field.
