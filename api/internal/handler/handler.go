@@ -17,6 +17,12 @@ import (
 var userService = service.NewUserService()
 var directionService = service.NewDirectionService()
 
+// PostUserTechnologiesRequest represents the request body for POST /users/technologies
+type PostUserTechnologiesRequest struct {
+	UserID       uint     `json:"user_id" binding:"required"`
+	Technologies []string `json:"technologies" binding:"required"`
+}
+
 // GetUsers godoc
 // @Summary Get users
 // @Tags users
@@ -408,6 +414,51 @@ func DeleteUser(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// GetUserTechnologies godoc
+// @Summary List technologies for a user
+// @Tags users
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {array} model.Technology
+// @Failure 400 {object} map[string]string
+// @Router /users/{id}/technologies [get]
+func GetUserTechnologies(c *gin.Context) {
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	techs, err := userService.TechnologiesByUserID(uint(id64))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, techs)
+}
+
+// PostUserTechnologies godoc
+// @Summary Replace user's technologies (POST)
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param input body handler.PostUserTechnologiesRequest true "User ID and technologies"
+// @Success 200 {array} model.Technology "Saved technologies"
+// @Failure 400 {object} map[string]string
+// @Router /users/technologies [post]
+func PostUserTechnologies(c *gin.Context) {
+	var body PostUserTechnologiesRequest
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	techs, err := userService.SetUserTechnologies(body.UserID, body.Technologies)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, techs)
+}
+
 // Utils
 func parseCSVList(s string) []string {
 	if s == "" {
@@ -519,4 +570,26 @@ func ListDirections(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, dirs)
+}
+
+// GetTechnologiesByDirection godoc
+// @Summary List technologies for a direction
+// @Tags directories
+// @Produce json
+// @Param id path int true "Direction ID"
+// @Success 200 {array} model.Technology
+// @Failure 400 {object} map[string]string
+// @Router /directions/{id}/technologies [get]
+func GetTechnologiesByDirection(c *gin.Context) {
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	techs, err := directionService.TechnologiesByDirectionID(uint(id64))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, techs)
 }

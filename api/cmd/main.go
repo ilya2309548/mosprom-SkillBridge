@@ -76,6 +76,10 @@ func main() {
 	r.PUT("/users/:id", handler.UpdateUser)
 	r.PATCH("/users/:id", handler.UpdateUser)
 	r.DELETE("/users/:id", handler.DeleteUser)
+	// POST fetch technologies by user ID
+	r.POST("/users/technologies", handler.PostUserTechnologies)
+	// User technologies
+	r.GET("/users/:id/technologies", handler.GetUserTechnologies)
 
 	// Public photos access by filename
 	r.GET("/photos/:filename", handler.GetPhotoByName)
@@ -88,6 +92,7 @@ func main() {
 
 	// Directions
 	r.GET("/directions", handler.ListDirections)
+	r.GET("/directions/:id/technologies", handler.GetTechnologiesByDirection)
 
 	clubAuth := r.Group("/clubs")
 	clubAuth.Use(middleware.JWTAuth())

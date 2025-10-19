@@ -98,3 +98,22 @@ func GetUserByTelegram(tg string) (model.User, error) {
 	err := db.DB.Where("telegram_name = ?", tg).First(&user).Error
 	return user, err
 }
+
+// ReplaceUserTechnologies replaces only the Technologies association for the user
+func ReplaceUserTechnologies(userID uint, technologies []model.Technology) error {
+	var user model.User
+	if err := db.DB.First(&user, userID).Error; err != nil {
+		return err
+	}
+	return db.DB.Model(&user).Association("Technologies").Replace(&technologies)
+}
+
+// GetTechnologiesByUserID returns technologies linked to the given user via user_technologies
+func GetTechnologiesByUserID(userID uint) ([]model.Technology, error) {
+	var techs []model.Technology
+	err := db.DB.Model(&model.Technology{}).
+		Joins("JOIN user_technologies ut ON ut.technology_id = technologies.id").
+		Where("ut.user_id = ?", userID).
+		Find(&techs).Error
+	return techs, err
+}

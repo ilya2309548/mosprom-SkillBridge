@@ -144,3 +144,18 @@ func (s *UserService) AuthenticateByTelegram(tg, password string) (model.User, e
 	}
 	return user, nil
 }
+
+func (s *UserService) TechnologiesByUserID(userID uint) ([]model.Technology, error) {
+	return repository.GetTechnologiesByUserID(userID)
+}
+
+func (s *UserService) SetUserTechnologies(userID uint, names []string) ([]model.Technology, error) {
+	techs, err := repository.FindOrCreateTechnologiesByNames(names)
+	if err != nil {
+		return nil, err
+	}
+	if err := repository.ReplaceUserTechnologies(userID, techs); err != nil {
+		return nil, err
+	}
+	return techs, nil
+}

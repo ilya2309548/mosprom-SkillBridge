@@ -36,4 +36,16 @@ func Init(cfg *config.Config) {
 		log.Fatal("failed to migrate database: ", err)
 	}
 
+	// Backfill: if the old one-to-many column technologies.direction_id exists, populate the new join table
+	migrator := DB.Migrator()
+	if migrator.HasColumn(&model.Technology{}, "direction_id") {
+		// Ensure unique index on the join to avoid duplicates
+		_ = DB.Exec("CREATE UNIQUE INDEX IF NOT EXISTS ux_direction_technologies ON direction_technologies (direction_id, technology_id)").Error
+		// Insert pairs for existing rows
+		_ = DB.Exec(`
+			INSERT INTO direction_technologies (direction_id, technology_id)
+			SELECT direction_id, id FROM technologies WHERE direction_id IS NOT NULL
+			ON CONFLICT (direction_id, technology_id) DO NOTHING
+		`).Error
+	}
 }
