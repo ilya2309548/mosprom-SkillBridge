@@ -58,15 +58,15 @@ fun MessageRow(
                 .padding(horizontal = 12.dp, vertical = 8.dp)
                 .weight(3f, fill = false)
         ) {
-            if (author.isNotBlank() && !isOutgoing) {
-                Text(author, style = MaterialTheme.typography.labelSmall, color = Color.Black.copy(alpha = 0.7f))
-            }
+            // Main message text (accent)
             Text(
-                text,
+                text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (isOutgoing) Color.White else Color.Black,
                 fontWeight = if (isOutgoing) FontWeight.Medium else FontWeight.Normal
             )
+
+            // Time aligned to the edge (bottom-right inside the bubble)
             Row(modifier = Modifier.fillMaxWidth()) {
                 Spacer(Modifier.weight(1f))
                 Text(time, style = MaterialTheme.typography.labelSmall, color = if (isOutgoing) Color.White.copy(0.8f) else Color.Black.copy(0.6f))

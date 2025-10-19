@@ -4,6 +4,7 @@ import dev.mos.prom.data.api.AuthService
 import dev.mos.prom.data.api.KtorClientProvider
 import dev.mos.prom.data.api.ProfileService
 import dev.mos.prom.data.api.ClubService
+import dev.mos.prom.data.api.ChatService
 import dev.mos.prom.data.repo.AuthRepository
 import dev.mos.prom.data.repo.ProfileRepository
 import dev.mos.prom.data.repo.ClubRepository
@@ -15,6 +16,8 @@ import dev.mos.prom.presentation.profile.viewmodel.ProfileViewModel
 import dev.mos.prom.presentation.splash.viewmodel.SplashViewModel
 import dev.mos.prom.presentation.club.viewmodel.ClubCreateViewModel
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsViewModel
+import dev.mos.prom.presentation.chat.viewmodel.ChatViewModel
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -32,6 +35,18 @@ val modules = module {
     single { AuthService(get()) }
     single { ProfileService(get()) }
     single { ClubService(get()) }
+    single { ChatService(get()) }
+
+    // JSON
+    single {
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            prettyPrint = false
+            encodeDefaults = true
+            coerceInputValues = true
+        }
+    }
 
     // Repositories
     single { AuthRepository(auth = get(), tokens = get()) }
@@ -46,4 +61,5 @@ val modules = module {
     viewModelOf(::ClubCreateViewModel)
     viewModelOf(::SearchViewModel)
     viewModelOf(::ClubDetailsViewModel)
+    viewModelOf(::ChatViewModel)
 }

@@ -2,9 +2,10 @@ package dev.mos.prom.data.api
 
 import dev.mos.prom.data.storage.TokenStorage
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.HttpHeaders
@@ -18,7 +19,7 @@ class KtorClientProvider(
     private val tokenStorage: TokenStorage,
 ) {
     val client: HttpClient by lazy {
-        HttpClient(Android) {
+    HttpClient(OkHttp) {
             expectSuccess = true
             install(Logging) {
                 level = LogLevel.ALL
@@ -29,6 +30,7 @@ class KtorClientProvider(
                     }
                 }
             }
+            install(WebSockets)
             install(ContentNegotiation) {
                 json(
                     Json {

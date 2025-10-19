@@ -2,17 +2,20 @@ package dev.mos.prom.data.api
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
-import io.ktor.http.ContentType
-import io.ktor.client.request.delete
+import io.ktor.http.path
+import io.ktor.http.path
 
 class AuthService(private val client: HttpClient) {
     suspend fun login(req: LoginRequest): LoginResponse =
@@ -126,4 +129,26 @@ class ClubService(private val client: HttpClient) {
 
     suspend fun subscribers(clubId: Long): List<UserDto> =
         client.get("/clubs/id/$clubId/subscribers").body()
+}
+
+class ChatService(private val client: HttpClient) {
+    suspend fun getChatIdByClubName(name: String): ChatIdResponse =
+        client.get {
+            url {
+                path("clubs", name, "chat")
+            }
+        }.body()
+
+    // Open a websocket session and provide the session to the caller for send/receive
+    suspend fun openSession(chatId: String, block: suspend DefaultClientWebSocketSession.() -> Unit) {
+        val safeId = chatId.trim().trim('{', '}').trim('"')
+        client.webSocket(
+            request = {
+                url {
+                    path("ws")
+                    parameters.append("chat_id", safeId)
+                }
+            }
+        ) { block() }
+    }
 }

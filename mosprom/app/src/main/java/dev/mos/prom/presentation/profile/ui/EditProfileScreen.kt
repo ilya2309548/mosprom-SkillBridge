@@ -81,7 +81,7 @@ fun EditProfileScreen(
                         }
                     )
                 },
-                containerColor = MaterialTheme.colorScheme.onSurface
+                containerColor = Color.White
             ) { padding ->
 
                 var name by remember(state.userModel.name) { mutableStateOf(state.userModel.name) }
@@ -210,10 +210,13 @@ fun EditProfileScreen(
                     ) {
                         Text("Сохранить", style = MaterialTheme.typography.labelLarge) }
 
-                    LaunchedEffect(state.status, lastSubmitted) {
-                        if (lastSubmitted) {
+                    LaunchedEffect(state.status) {
+                        if (lastSubmitted && state.status == MosPromResult.Success) {
                             lastSubmitted = false
-                            navController.navigate(Route.Profile)
+                            navController.navigate(Route.Profile) {
+                                popUpTo(Route.EditProfile) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         }
                     }
                 }
