@@ -49,6 +49,7 @@ import dev.mos.prom.R
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsEvent
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsViewModel
 import dev.mos.prom.utils.navigation.MosPromTopBar
+import dev.mos.prom.utils.navigation.Route
 import dev.mos.prom.utils.placeholderPainter
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -62,13 +63,17 @@ fun ClubDetailsScreen(
     logoUrl: String? = null,
     description: String? = null,
     directions: List<String> = emptyList(),
+    isCreator: Boolean = false,
 ) {
     var tabIndex by remember { mutableIntStateOf(0) }
     val scroll = rememberScrollState()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(id) { viewModel.onEvent(ClubDetailsEvent.Load(id)) }
+    LaunchedEffect(id) {
+        viewModel.onEvent(ClubDetailsEvent.Load(id))
+    }
+
     val clubName = name ?: "Клуб #$id"
     val uiLogo = logoUrl
     val uiDescription = description ?: "Описание клуба. Здесь краткая информация о деятельности, целях и задачах клуба."
@@ -95,15 +100,45 @@ fun ClubDetailsScreen(
                     .padding(16.dp)
                     .navigationBarsPadding(),
             ) {
-                Button(
-                    onClick = { viewModel.onEvent(ClubDetailsEvent.Subscribe(id)) },
-                    enabled = !state.isSubscribing && !state.subscribed,
-                    modifier = Modifier.align(Alignment.Center)
+                Row(
+                    modifier = Modifier.align(Alignment.Center),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        if (state.subscribed) "Подписаны" else "Подписаться",
-                        style = MaterialTheme.typography.labelLarge
-                    )
+
+                    Button(
+                        onClick = {
+                            navController.navigate(Route.ClubChat(id = id, name = clubName))
+                        },
+                        modifier = Modifier
+                    ) {
+                        Text("Чат", style = MaterialTheme.typography.labelLarge)
+                    }
+
+                    Spacer(Modifier.width(12.dp))
+
+                    if (!isCreator && !state.subscribed) {
+                        Button(
+                            onClick = { viewModel.onEvent(ClubDetailsEvent.Subscribe(id)) },
+                            enabled = !state.isSubscribing ,
+                            modifier = Modifier
+                        ) {
+                            Text(
+                                text = "Подписаться",
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
+                    }
+
+
+                    if (isCreator) {
+                        Spacer(Modifier.width(12.dp))
+
+                        Button(
+                            onClick = { navController.navigate(dev.mos.prom.utils.navigation.Route.CreatePost) },
+                        ) {
+                            Text("Добавить пост", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
                 }
             }
         }

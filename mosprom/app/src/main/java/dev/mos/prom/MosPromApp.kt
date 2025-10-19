@@ -20,6 +20,7 @@ import dev.mos.prom.presentation.club.ui.ClubDetailsScreen
 import dev.mos.prom.presentation.search.ui.SearchScreen
 import dev.mos.prom.presentation.splash.ui.SplashScreen
 import dev.mos.prom.presentation.ui.theme.MospromTheme
+import dev.mos.prom.presentation.chat.ui.ClubChatScreen
 
 @Composable
 fun MosPromApp() {
@@ -97,6 +98,7 @@ fun MosPromApp() {
 
                 composable<Route.Club> { backStackEntry ->
                     val args = backStackEntry.toRoute<Route.Club>()
+
                     ClubDetailsScreen(
                         navController = navController,
                         innerPadding = innerPadding,
@@ -104,7 +106,17 @@ fun MosPromApp() {
                         name = args.name,
                         logoUrl = args.logoUrl,
                         description = args.description,
-                        directions = args.directions
+                        directions = args.directions,
+                        isCreator = args.isCreator,
+                    )
+                }
+
+                composable<Route.ClubChat> { backStackEntry ->
+                    val args = backStackEntry.toRoute<Route.ClubChat>()
+                    ClubChatScreen(
+                        navController = navController,
+                        innerPadding = innerPadding,
+                        clubName = args.name,
                     )
                 }
 

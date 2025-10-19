@@ -56,6 +56,7 @@ data class ClubDto(
     val name: String,
     val logo: String? = null,
     val description: String? = null,
+    @SerialName("creator_id") val creatorId: Long? = null,
     val directions: List<DirectionDto> = emptyList(),
 )
 

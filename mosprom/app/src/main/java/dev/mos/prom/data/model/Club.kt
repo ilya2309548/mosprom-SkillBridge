@@ -6,4 +6,5 @@ data class Club(
     val description: String,
     val logoUrl: String?,
     val directions: List<String>,
+    val creatorId: Long? = null,
 )

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.mos.prom.data.model.Club
 import dev.mos.prom.data.repo.ClubRepository
+import dev.mos.prom.data.repo.ProfileRepository
 import dev.mos.prom.utils.MosPromResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val repo: ClubRepository
+    private val repo: ClubRepository,
+    private val profileRepo: ProfileRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SearchState())
@@ -38,12 +40,14 @@ class SearchViewModel(
             try {
                 val dirs = repo.directions()
                 val clubs = repo.searchClubs(name = null, directions = emptyList())
+                val myId = try { profileRepo.myId() } catch (_: Throwable) { null }
                 _state.update { s ->
                     s.copy(
                         status = MosPromResult.Success,
                         directions = dirs,
                         clubs = clubs,
-                        visibleClubs = filter(clubs, s.query)
+                        visibleClubs = filter(clubs, s.query),
+                        myId = myId,
                     )
                 }
             } catch (t: Throwable) {

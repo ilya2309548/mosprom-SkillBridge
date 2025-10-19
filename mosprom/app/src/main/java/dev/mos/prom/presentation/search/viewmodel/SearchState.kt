@@ -11,4 +11,5 @@ data class SearchState(
     val selectedDirections: Set<String> = emptySet(),
     val clubs: List<Club> = emptyList(),
     val visibleClubs: List<Club> = emptyList(),
+    val myId: Long? = null,
 )

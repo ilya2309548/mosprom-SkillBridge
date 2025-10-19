@@ -9,6 +9,8 @@ class ProfileRepository(private val api: ProfileService) {
         return dto.toUserModel()
     }
 
+    suspend fun myId(): Long = api.me().id
+
     suspend fun update(
         name: String?, telegram: String?, description: String?, university: String?, directions: List<String>? = null
     ): UserModel {

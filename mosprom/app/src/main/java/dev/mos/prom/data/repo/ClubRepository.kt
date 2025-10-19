@@ -37,5 +37,6 @@ private fun ClubDto.toClub(): Club = Club(
     name = name,
     description = description.orEmpty(),
     logoUrl = logo?.let { if (it.startsWith("http")) it else "http://81.29.146.35:8080/photos/$it" },
-    directions = directions.map { it.name }
+    directions = directions.map { it.name },
+    creatorId = creatorId,
 )

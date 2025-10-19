@@ -62,17 +62,20 @@ fun SearchScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var showDirectionsSheet by remember { mutableStateOf(false) }
+    // myId now provided by SearchViewModel state (see VM change in a later step)
     val scroll = rememberScrollState()
 
     LaunchedEffect(Unit) { viewModel.onEvent(SearchEvent.OnLoad) }
 
     when (state.status) {
         MosPromResult.Loading -> MosPromLoadingBar(modifier = Modifier.padding(innerPadding))
+
         MosPromResult.Error -> MosPromErrorMessage(
             modifier = Modifier.padding(innerPadding),
             text = state.error,
             onUpdate = { viewModel.onEvent(SearchEvent.Retry) }
         )
+
         MosPromResult.Success -> {
             Scaffold(
                 topBar = { MosPromTopBar(title = "Поиск") },
@@ -151,13 +154,16 @@ fun SearchScreen(
                                 .fillMaxWidth()
                                 .padding(bottom = 12.dp)
                                 .clickable {
+                                    val myId = state.myId
+                                    val isCreator = club.creatorId != null && myId != null && club.creatorId == myId
                                     navController.navigate(
                                         Route.Club(
                                             id = club.id,
                                             name = club.name,
                                             logoUrl = club.logoUrl,
                                             description = club.description,
-                                            directions = club.directions
+                                            directions = club.directions,
+                                            isCreator = isCreator,
                                         )
                                     )
                                 }
