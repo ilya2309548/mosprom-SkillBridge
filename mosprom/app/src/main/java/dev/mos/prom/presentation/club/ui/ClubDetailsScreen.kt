@@ -38,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,6 +47,7 @@ import coil.compose.AsyncImage
 import dev.mos.prom.R
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsEvent
 import dev.mos.prom.presentation.club.viewmodel.ClubDetailsViewModel
+import dev.mos.prom.presentation.ui.text.MosPromLoadingBar
 import dev.mos.prom.utils.navigation.MosPromTopBar
 import dev.mos.prom.utils.navigation.Route
 import dev.mos.prom.utils.placeholderPainter
@@ -245,37 +245,49 @@ fun ClubDetailsScreen(
 
             when (tabIndex) {
                 0 -> {
-                    Column (
+                    MosPromLoadingBar(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_no_posts),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(140.dp)
-                                .padding(vertical = 24.dp),
-                            contentScale = ContentScale.FillWidth
-                        )
-                    }
+                        containerColor = Color.White
+                    )
+
+//                    Column (
+//                        modifier = Modifier
+//                            .fillMaxWidth(),
+//                        horizontalAlignment = Alignment.CenterHorizontally
+//                    ) {
+//                        Image(
+//                            painter = painterResource(R.drawable.ic_no_posts),
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .width(140.dp)
+//                                .padding(vertical = 24.dp),
+//                            contentScale = ContentScale.FillWidth
+//                        )
+//                    }
 
                 }
                 1 -> {
-                    Column (
+                    MosPromLoadingBar(
                         modifier = Modifier
                             .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_no_posts),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .width(140.dp)
-                                .padding(vertical = 24.dp),
-                            contentScale = ContentScale.FillWidth
-                        )
-                    }
+                        containerColor = Color.White
+                    )
+
+//                    Column (
+//                        modifier = Modifier
+//                            .fillMaxWidth(),
+//                        horizontalAlignment = Alignment.CenterHorizontally
+//                    ) {
+//                        Image(
+//                            painter = painterResource(R.drawable.ic_no_posts),
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .width(140.dp)
+//                                .padding(vertical = 24.dp),
+//                            contentScale = ContentScale.FillWidth
+//                        )
+//                    }
                 }
             }
             Spacer(Modifier.height(80.dp))

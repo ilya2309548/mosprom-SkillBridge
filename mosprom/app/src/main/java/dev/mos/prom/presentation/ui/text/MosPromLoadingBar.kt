@@ -26,7 +26,8 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
 fun MosPromLoadingBar (
-    modifier: Modifier
+    modifier: Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset("dino.json"))
     val progress by animateLottieCompositionAsState(
@@ -44,7 +45,7 @@ fun MosPromLoadingBar (
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onSurfaceVariant)
+            .background(containerColor)
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
